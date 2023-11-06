@@ -2,11 +2,11 @@
 
 ## Team members
 The members of the team are:
-- *enter full name 1 here*
-- *enter full name 2 here*
-- *enter full name 3 here*
-- *enter full name 4 here*
-- *enter full name 5 here*
+- Hasan Issa
+- Lewis Kai Ho Wong
+- Fardeen Idrus
+- Adil Kassam
+- Bruno Miguel Fonseca Cavaca
 
 ## Project structure
 The project is called `task_manager`.  It currently consists of a single app `tasks`.
