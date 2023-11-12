@@ -108,3 +108,7 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
             password=self.cleaned_data.get('new_password'),
         )
         return user
+
+class CreateBoard(forms.Form):
+    board_name = forms.CharField(label="Board Name",max_length=50)
+    

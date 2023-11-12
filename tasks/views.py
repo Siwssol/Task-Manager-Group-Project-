@@ -19,6 +19,10 @@ def dashboard(request):
     current_user = request.user
     return render(request, 'dashboard.html', {'user': current_user})
 
+@login_required
+def CreateBoardView(request):
+    """ Display board creation screen"""
+    return render(request, 'create_board.html')
 
 @login_prohibited
 def home(request):
