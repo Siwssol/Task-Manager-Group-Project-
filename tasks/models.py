@@ -51,9 +51,7 @@ class List(models.Model):
 
 
 
-        
-
-        return self.gravatar(size=60)
+       
     
 class Board(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
