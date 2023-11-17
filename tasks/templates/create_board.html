@@ -1,6 +1,7 @@
 {% extends 'base_content.html' %}
 {% block content %}
 <div class="container">
+<<<<<<< Updated upstream
     <div class="row">
       <div class="col-sm-12 col-md-6 offset-md-3">
         <h1>Log in</h1>
@@ -9,9 +10,21 @@
           <input type="hidden" name="next" value="{{ next }}">
           {% include 'partials/bootstrap_form.html' with form=form %}
           <input type="submit" value="Log in" class="btn btn-primary">
+=======
+      <div class="row">
+        <div class="col-12">
+      <form class="form-group" action="{% url 'create_board_view' %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <input type="submit" value="Submit Board" class="btn btn-primary">
+>>>>>>> Stashed changes
         </form>
       </div>
     </div>
   </div>
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 {% endblock %}

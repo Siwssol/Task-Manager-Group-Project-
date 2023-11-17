@@ -1,6 +1,7 @@
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.forms import ModelForm
 from libgravatar import Gravatar
 
 class User(AbstractUser):
@@ -17,7 +18,6 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
-
 
     class Meta:
         """Model options."""
@@ -40,3 +40,18 @@ class User(AbstractUser):
         """Return a URL to a miniature version of the user's gravatar."""
         
         return self.gravatar(size=60)
+    
+class Board(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    BOARD_CHOICES = (('INVALID','Choose Type'),
+                    ('Private','Private'),
+                    ('Team','Team'),
+                    )
+        
+    board_name = models.CharField(primary_key=True,
+                                max_length=30,
+                                unique=True,
+                                )
+    
+    board_type = models.CharField(max_length=11,choices=BOARD_CHOICES,default='INVALID')
+    team_emails = models.TextField(default="Enter team emails here if necessary, seperated by commas.")
