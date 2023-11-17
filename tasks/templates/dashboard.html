@@ -1,10 +1,113 @@
 {% extends 'base_content.html' %}
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col-12">
-      <h1>Welcome to your dashboard {{ user.username }}</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2>Welcome to your dashboard {{ user.username }} </h2>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <button class="taskbutton" data-bs-toggle="collapse" data-bs-target="#todo">To do</button>
+                    </div>
+
+                    <div id="todo" class="collapse">
+                        <div class="panel-body">
+                            <!-- Currently just a template and there is no tasks currently stored-->
+                            {%  comment %}
+                            {%for task in task_data  %}
+                            {%  endcomment %}
+                            <div class="row">
+                                <div class="col-6">
+                                    {% comment %}
+                                    {{ task.taskName }}
+                                    {% endcomment %}
+                                    Name of task
+                                </div>
+                                <div class="col-6">
+                                    {% comment %}
+                                    {{ task.dueDate }}
+                                    {% endcomment %}
+                                    Due date
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <button class="taskbutton" data-bs-toggle="collapse" data-bs-target="#in_progress">In Progress</button>
+                    </div>
+
+                    <div id="in_progress" class="collapse">
+                        <div class="panel-body">
+                            <!-- Currently just a template and there is no tasks currently stored-->
+                            {%  comment %}
+                            {%for task in task_data  %}
+                            {%  endcomment %}
+                            <div class="row">
+                                <div class="col-6">
+                                    {% comment %}
+                                    {{ task.taskName }}
+                                    {% endcomment %}
+                                    Name of task
+                                </div>
+                                <div class="col-6">
+                                    {% comment %}
+                                    {{ task.dueDate }}
+                                    {% endcomment %}
+                                    Due date
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <button class="taskbutton" data-bs-toggle="collapse" data-bs-target="#completed">Completed</button>
+                    </div>
+
+                    <div id="completed" class="collapse">
+                        <div class="panel-body">
+                            <!-- Currently just a template and there is no tasks currently stored-->
+                            {% comment %}
+                            {%for task in task_data  %}
+                            {%  endcomment %}
+                            <div class="row">
+                                <div class="col-6">
+                                    {% comment %}
+                                    {{ task.taskName }}
+                                    {% endcomment %}
+                                    Name of task
+                                </div>
+                                <div class="col-6">
+                                    {% comment %}
+                                    {{ task.dueDate }}
+                                    {% endcomment %}
+                                    Due date
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        Panel footer
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 {% endblock %}
