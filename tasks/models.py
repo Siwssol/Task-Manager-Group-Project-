@@ -47,6 +47,7 @@ class User(AbstractUser):
 class Task(models.Model):
 
     """Model used for creating tasks, with attached parameters."""
+    list = models.ForeignKey(List, on_delete=models.CASCADE)
     #Defines the name
     task_name = models.CharField(max_length=50, blank=False)
     # Defines the status
