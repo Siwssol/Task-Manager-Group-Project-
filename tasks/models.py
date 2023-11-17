@@ -45,6 +45,9 @@ class User(AbstractUser):
 
 
 class Task(models.Model):
+
+    """Model used for creating tasks, with attached parameters."""
+
     task_name = models.CharField(max_length=50, blank=False)
     status = models.CharField(max_length=50, blank=False)
     task_description = models.TextField(max_length=1000)
