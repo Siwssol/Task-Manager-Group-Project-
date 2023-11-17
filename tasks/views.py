@@ -22,11 +22,6 @@ def dashboard(request):
     return render(request, 'dashboard.html', {'user': current_user})
 
 @login_required
-<<<<<<< Updated upstream
-def CreateBoardView(request):
-    """ Display board creation screen"""
-    return render(request, 'create_board.html')
-=======
 def create_board_view(request):
     """ Display board creation screen"""
     form = CreateBoardForm()
@@ -43,7 +38,6 @@ def create_board_view(request):
             return render(request, 'create_board.html', {'form':form})
     else:
         return render(request, 'create_board.html', {'form':form})
->>>>>>> Stashed changes
 
 @login_prohibited
 def home(request):

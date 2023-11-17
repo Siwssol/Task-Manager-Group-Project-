@@ -109,11 +109,6 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         )
         return user
 
-<<<<<<< Updated upstream
-class CreateBoard(forms.Form):
-    board_name = forms.CharField(label="Board Name",max_length=50)
-    
-=======
 class CreateBoardForm(forms.ModelForm):
     """Form enabling user to create a board"""
     
@@ -150,4 +145,3 @@ class CreateBoardForm(forms.ModelForm):
             board_type = self.cleaned_data.get('board_type'),
             team_emails = self.cleaned_data.get('team_emails'),
         )
->>>>>>> Stashed changes
