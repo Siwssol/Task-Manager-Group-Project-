@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from datetime import datetime
 
 class TaskModelTestCase(TestCase):
-
+    # Initialises the ideal response
     def setUp(self):
         self.task = Task.objects.get(test_name='Create User Stories',
                                      status='To Do',
