@@ -15,6 +15,7 @@
   padding-top: 10px;
 }
 
+
 .h-100 {
   min-height: 100vh;
   height: 100vh;
@@ -28,16 +29,23 @@
 /*
  * Cover page
  */
+
+ /*
+* Change font of text on home page
+*/
 h1.cover-heading {
   font-size: 4rem;
+  font-family: "Lucida Console", "Courier New", monospace;
 }
 
 p.cover-text {
   font-size: 1.7rem;
-}
+  font-family: 'Roboto', sans-serif;
+  color: antiquewhite
+  }
 
 .cover-card {
-  background-color: rgba(245, 245, 245, 0.6);
+  background-color: rgba(48, 213, 200, 0.927);
   max-width: 30rem;
   padding-top: 30px;
   padding-left: 50px;
@@ -48,6 +56,20 @@ p.cover-text {
 .cover-card-block {
   opacity: 1
 }
+
+/*
+* Buttons
+*/
+.btn-secondary {
+  background-color:black; 
+  border-color: black; 
+}
+
+
+/*
+To implement: 
+
+*/
 
 
 /*
@@ -113,3 +135,5 @@ h3.profile-title {
   text-decoration: underline;
   color: #0d6efd;
 }
+
+
