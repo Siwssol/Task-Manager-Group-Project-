@@ -38,5 +38,13 @@ class User(AbstractUser):
 
     def mini_gravatar(self):
         """Return a URL to a miniature version of the user's gravatar."""
-        
+
         return self.gravatar(size=60)
+
+"""Each task will be stored in a certain list, so we need to keep track on which list the task is in"""
+class List(models.Model):
+    """ board = models.ForeignKey(Board, on_delete=models.CASCADE())
+    """
+    listName = models.CharField(max_length=50, blank=False)
+
+
