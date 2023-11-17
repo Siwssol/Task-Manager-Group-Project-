@@ -19,8 +19,8 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
-
-
+    
+    
     class Meta:
         """Model options."""
 
@@ -43,6 +43,48 @@ class User(AbstractUser):
         
         return self.gravatar(size=60)
 
+
+class Teams():
+    """initialises the teams and shows what type of permissions there are """
+    permissions = ['owner', 'admin', 'member', 'guest']
+    def __init__(self):
+        self.teammembers = []
+        self.teampermissions = []
+        
+    """function for adding a user to the team"""
+    def add_user(self, user):
+        self.teammembers.append(user)
+        if 'owner' not in self.teampermissions:
+            self.teampermissions.append('owner')
+        else:
+            self.teampermissions.append('guest')
+    """function for inviting users after team has been initialised"""
+    def invite_user(self, user, str):
+        self.teammembers.append(user)
+        """invite via email will go in here once it is figured out how to do so"""
+        if str.lower() in Teams.permissions:
+            if str.lower() != 'owner':
+                self.teammembers.append(str.lower())
+            else:
+                print("only one owner can exist within a board")
+    
+    """function for changing ownership if need be"""
+    """this ensures that the owner level of permission has to be willingly changed rather than being able to make a new user as an owner"""
+    
+    def change_ownership(self, user, user2):
+        pos1 = self.teammembers.index(user)
+        pos2 = self.teammembers.index(user2)    
+        if pos1 == self.teampermissions.index('owner'):
+            self.teampermissions[pos1], self.teampermissions[pos2] = self.teampermissions[pos2], self.teampermissions[pos1]
+
+    def change_perms(self,user,str):
+        pos = self.teammembers.index(user)
+        if str in Teams.permissions:    
+            if self.teampermissions[pos] != 'owner':
+                self.teampermissions[pos] = str.lower()
+
+    class Meta:
+        managed = False
 
 class Task(models.Model):
 
