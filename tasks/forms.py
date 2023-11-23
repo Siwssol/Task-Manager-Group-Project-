@@ -108,3 +108,9 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
             password=self.cleaned_data.get('new_password'),
         )
         return user
+    
+
+class EditTaskNameForm(forms.ModelForm):
+
+    task_id = forms.IntegerField()
+    new_name = forms.CharField(max_length=50, blank=False)
