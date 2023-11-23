@@ -28,5 +28,6 @@ urlpatterns = [
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('change-task-name/', views.change_task_name, name='change_task_name'),
+    path('change-task-name/', views.change_task_description, name='change_task_description'),
 
 ]

@@ -10,7 +10,8 @@ from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
 from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm
 from tasks.helpers import login_prohibited
-from .forms import EditTaskNameForm
+from .forms import EditTaskNameForm, EditTaskDescriptionForm
+
 
 
 @login_required
@@ -169,3 +170,20 @@ def change_task_name(request):
         form = EditTaskNameForm()
 
     return render(request, 'change_task_name.html', {'form': form})    
+
+def change_task_description(request):
+    if request.method == 'POST':
+        form = EditTaskDescriptionForm(request.POST)
+        if form.is_valid():
+            # Process the form data 
+            task_id = form.cleaned_data['task_id']
+            new_description = form.cleaned_data['new_description']
+
+            # Perform the task update logic 
+            Task.objects.filter(id=task_id).update(task_name=new_description)
+
+            
+    else:
+        form = EditTaskDescriptionForm()
+
+    return render(request, 'change_task_description.html', {'form': form})  
