@@ -44,15 +44,21 @@ class User(AbstractUser):
 
         return self.gravatar(size=60)
 
-"""Each task will be stored in a certain list, so we need to keep track on which list the task is in"""
-class List(models.Model):
-    """ board = models.ForeignKey(Board, on_delete=models.CASCADE())
-    """
-    listName = models.CharField(max_length=50, blank=False)
 
-
-
+class Board(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    BOARD_CHOICES = (('INVALID','Choose Type'),
+                    ('Private','Private'),
+                    ('Team','Team'),
+                    )
         
+    board_name = models.CharField(primary_key=True,
+                                max_length=30,
+                                unique=True,
+                                )
+    
+    board_type = models.CharField(max_length=11,choices=BOARD_CHOICES,default='INVALID')
+    team_emails = models.TextField(default="Enter team emails here if necessary, seperated by commas")
 
 
 class Teams():
@@ -97,11 +103,17 @@ class Teams():
     class Meta:
         managed = False
 
+
+"""Each task will be stored in a certain list, so we need to keep track on which list the task is in"""
+class TaskList(models.Model):
+    board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    listName = models.CharField(max_length=50, blank=False, unique=True)
+
 class Task(models.Model):
 
     """Model used for creating tasks, with attached parameters."""
     # Links the task model to the list
-    list = models.ForeignKey(List, on_delete=models.CASCADE)
+    list = models.ForeignKey(TaskList, on_delete=models.CASCADE, default="To do")
     #Defines the name
     task_name = models.CharField(max_length=50, blank=False)
     # Defines the status
@@ -110,4 +122,3 @@ class Task(models.Model):
     task_description = models.TextField(max_length=1000)
     #Defines the due Date
     due_date = models.DateTimeField()
-
