@@ -109,6 +109,14 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         )
         return user
 
+    
+
+class EditTaskNameForm(forms.ModelForm):
+
+    task_id = forms.IntegerField()
+    new_name = forms.CharField(max_length=50, blank=False)
+
+
 
 class CreateBoardForm(forms.ModelForm):
     """Form enabling user to create a board"""
