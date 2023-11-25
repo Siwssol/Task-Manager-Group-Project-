@@ -2,6 +2,7 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.core.validators import RegexValidator
+
 from .models import User, Board
 
 class LogInForm(forms.Form):
@@ -92,7 +93,6 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
 
     class Meta:
         """Form options."""
-
         model = User
         fields = ['first_name', 'last_name', 'username', 'email']
 
@@ -112,6 +112,7 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
 
 class CreateBoardForm(forms.ModelForm):
     """Form enabling user to create a board"""
+    
 
     class Meta:
         """Board Form Options"""
@@ -126,6 +127,7 @@ class CreateBoardForm(forms.ModelForm):
         board_type = self.cleaned_data.get('board_type')
 
         if board_type == 'INVALID':
+
             self.add_error('board_type', 'Board Type is not valid. Please choose another type.')
 
         team_members = self.cleaned_data.get('team_emails')
@@ -145,3 +147,5 @@ class CreateBoardForm(forms.ModelForm):
             board_type=self.cleaned_data.get('board_type'),
             team_emails=self.cleaned_data.get('team_emails'),
         )
+
+            

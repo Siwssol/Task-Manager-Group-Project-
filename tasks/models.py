@@ -1,6 +1,7 @@
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.forms import ModelForm
 from libgravatar import Gravatar
 from datetime import datetime
 
@@ -19,8 +20,6 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
-    
-    
     class Meta:
         """Model options."""
 
@@ -43,6 +42,7 @@ class User(AbstractUser):
 
 
         return self.gravatar(size=60)
+
 
 
 class Board(models.Model):
@@ -102,7 +102,6 @@ class Teams():
 
     class Meta:
         managed = False
-
 
 """Each task will be stored in a certain list, so we need to keep track on which list the task is in"""
 class TaskList(models.Model):

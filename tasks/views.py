@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -6,12 +7,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
+from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
 from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm
 from tasks.helpers import login_prohibited
 from .models import Board, TaskList
-
 
 @login_required
 def dashboard(request):
@@ -22,6 +23,23 @@ def dashboard(request):
         print(i)
     return render(request, 'dashboard.html', {'user': current_user, 'boards' : current_boards})
 
+@login_required
+def create_board_view(request):
+    """ Display board creation screen"""
+    form = CreateBoardForm()
+    if request.method == 'POST':
+        current_user = request.user
+        form = CreateBoardForm(request.POST)
+        if form.is_valid():
+            board_name = form.cleaned_data.get('board_name')
+            board_type = form.cleaned_data.get('board_type')
+            board_members = form.cleaned_data.get('team_emails')
+            board = Board.objects.create(author=current_user, board_name = board_name, board_type=board_type, team_emails = board_members)
+            return render(request,'dashboard.html',{'user':current_user})
+        else:
+            return render(request, 'create_board.html', {'form':form})
+    else:
+        return render(request, 'create_board.html', {'form':form})
 
 @login_required
 def create_board_view(request):
@@ -51,6 +69,7 @@ def home(request):
 
     return render(request, 'home.html')
 
+  
 def board(request, board_name):
     """Display specific board"""
     lists = TaskList.objects.all().filter(board = board_name)
