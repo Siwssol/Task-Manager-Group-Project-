@@ -28,5 +28,6 @@ urlpatterns = [
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('create_board/',views.create_board_view,name='create_board_view'),
-    ]
+    path('boards/<str:board_name>', views.board, name='board')
+]
 
