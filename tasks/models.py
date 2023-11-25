@@ -107,7 +107,7 @@ class Teams():
 """Each task will be stored in a certain list, so we need to keep track on which list the task is in"""
 class TaskList(models.Model):
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
-    listName = models.CharField(max_length=50, blank=False, unique=True)
+    listName = models.CharField(max_length=50, blank=False)
 
 class Task(models.Model):
 

@@ -21,6 +21,10 @@
         display: inline-block;
     }
 
+    .boardLink {
+        text-decoration: none !important;
+    }
+
 
    .boards {
   display: grid;
@@ -35,6 +39,7 @@
   transition: transform 0.5s;
        width: 300px;
        height: 600px;
+
 }
 
 .boards:hover {
@@ -71,8 +76,8 @@
     <div class="container " class="boardsContainer">
         <div class="row " class="boardsRow">
             {% for board in boards %}
-            <div class="col-4 boardCont">
-                <button type="button" class="boards">{{ board.board_name }}</button>
+            <div class="col-4" class="boardCont">
+                <a class ="boardLink" href= "{% url 'board' board.board_name %}"><button type="button" class="boards"  >{{ board.board_name }}</button></a>
             </div>
             {% endfor %}
 

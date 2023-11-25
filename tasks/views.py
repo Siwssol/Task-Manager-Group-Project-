@@ -4,7 +4,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
@@ -51,8 +51,10 @@ def home(request):
 
     return render(request, 'home.html')
 
-"Displays page for a User's Board"
-"""def CreateBoardView(View):"""
+def board(request, board_name):
+    """Display specific board"""
+    lists = TaskList.objects.all().filter(board = board_name)
+    return render(request, 'board.html', {'lists': lists})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
