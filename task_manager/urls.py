@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from tasks import views
 
-urlpatterns = [
+urlpatterns = [    
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -29,5 +29,8 @@ urlpatterns = [
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('change-task-name/', views.change_task_name, name='change_task_name'),
     path('change-task-name/', views.change_task_description, name='change_task_description'),
+    path('create_board/',views.create_board_view,name='create_board_view'),
+    path('boards/<str:board_name>', views.board, name='board')
 
 ]
+

@@ -1,26 +1,69 @@
 from django.conf import settings
+from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
+from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
-from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm
+from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm
 from tasks.helpers import login_prohibited
 from .forms import EditTaskNameForm, EditTaskDescriptionForm
-
+from .models import Board, TaskList
 
 
 @login_required
 def dashboard(request):
     """Display the current user's dashboard."""
-
     current_user = request.user
-    return render(request, 'dashboard.html', {'user': current_user})
+    current_boards = Board.objects.all()
+    for i in current_boards:
+        print(i)
+    return render(request, 'dashboard.html', {'user': current_user, 'boards' : current_boards})
 
+@login_required
+def create_board_view(request):
+    """ Display board creation screen"""
+    form = CreateBoardForm()
+    if request.method == 'POST':
+        current_user = request.user
+        form = CreateBoardForm(request.POST)
+        if form.is_valid():
+            board_name = form.cleaned_data.get('board_name')
+            board_type = form.cleaned_data.get('board_type')
+            board_members = form.cleaned_data.get('team_emails')
+            board = Board.objects.create(author=current_user, board_name = board_name, board_type=board_type, team_emails = board_members)
+            return render(request,'dashboard.html',{'user':current_user})
+        else:
+            return render(request, 'create_board.html', {'form':form})
+    else:
+        return render(request, 'create_board.html', {'form':form})
+
+@login_required
+def create_board_view(request):
+    """ Display board creation screen"""
+    form = CreateBoardForm()
+    if request.method == 'POST':
+        current_user = request.user
+        form = CreateBoardForm(request.POST)
+        if form.is_valid():
+            board_name = form.cleaned_data.get('board_name')
+            board_type = form.cleaned_data.get('board_type')
+            board_members = form.cleaned_data.get('team_emails')
+            board = Board.objects.create(author=current_user, board_name = board_name, board_type=board_type, team_emails = board_members)
+            TaskList.objects.create(board = board, listName="To Do")
+            TaskList.objects.create(board = board, listName="In Progress")
+            TaskList.objects.create(board = board, listName="Completed")
+            boards = Board.objects.all()
+            return render(request,'dashboard.html',{'user':current_user, 'boards': boards})
+        else:
+            return render(request, 'create_board.html', {'form':form})
+    else:
+        return render(request, 'create_board.html', {'form':form})
 
 @login_prohibited
 def home(request):
@@ -28,6 +71,11 @@ def home(request):
 
     return render(request, 'home.html')
 
+  
+def board(request, board_name):
+    """Display specific board"""
+    lists = TaskList.objects.all().filter(board = board_name)
+    return render(request, 'board.html', {'lists': lists})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -153,6 +201,7 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
     
 def change_task_name(request):
     if request.method == 'POST':
@@ -187,3 +236,8 @@ def change_task_description(request):
         form = EditTaskDescriptionForm()
 
     return render(request, 'change_task_description.html', {'form': form})  
+
+
+
+
+
