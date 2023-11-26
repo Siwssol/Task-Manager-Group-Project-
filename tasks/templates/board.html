@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends 'base_content.html' %}
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="container " class="taskListContainer">
+        <div class="row" class="ListRow">
+        {% for list in lists %}
+            <div class = "col-4" class ="TaskLists">
+                <h1>{{ list.listName }}</h1>
+            </div>
+         {% endfor%}
+
+        </div>
+    </div>
+
+</body>
+
+{% endblock %}
+</html>
