@@ -1,7 +1,14 @@
 <div class="collapse navbar-collapse" id="navbarSupportedContent">
   <ul class="navbar-nav me-auto mb-2 mb-lg-0">
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'create_board_view' %}">Create Board</a>
+        <!-- Decided can only create boards when you're on the dashboard and not in a specific board-->
+        <!-- Can choose a different layout-->
+          {% if 'boards' in request.path %}
+              <!--Need to add members page to view members...-->
+              <a class="nav-link" >View members</a>
+          {% else %}
+              <a class="nav-link" href="{% url 'create_board_view' %}">Create Board</a>
+          {% endif %}
       </li>
   </ul>
   <li class="nav-item dropdown">

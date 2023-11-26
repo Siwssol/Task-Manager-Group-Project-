@@ -1,128 +1,94 @@
+<!DOCTYPE html>
 {% extends 'base_content.html' %}
 {% block content %}
+    <!--CSS -->
     <style>
-    .due_date {
-        height: 30px;
+    .containerTop {
+        display: flex;
+        justify-content: center;
     }
+
+    .boardsContainer{
+        margin: auto;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .boardsRow {
+        overflow-x: auto;
+        flex-flow: nowrap;
+        white-space: nowrap;
+        display: inline-block;
+    }
+
+    .boardLink {
+        text-decoration: none !important;
+    }
+
+
+   .boards {
+  display: grid;
+  place-items: center;
+  background: #e3edf7;
+  padding: 1.4em;
+  border-radius: 12px;
+  box-shadow: 6px 6px 10px -1px rgba(0,0,0,0.15),
+	      -6px -6px 10px -1px rgba(255,255,255,0.7);
+  border: 1px solid rgba(0,0,0,0);
+  cursor: pointer;
+  transition: transform 0.5s;
+       width: 300px;
+       height: 600px;
+
+}
+
+.boards:hover {
+  box-shadow: inset 4px 4px 6px -1px rgba(0,0,0,0.2),
+	      inset -4px -4px 6px -1px rgba(255,255,255,0.7),
+	      -0.5px -0.5px 0px rgba(255,255,255,1),
+	      0.5px 0.5px 0px rgba(0,0,0,0.15),
+	      0px 12px 10px -10px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.1);
+  transform: translateY(0.5em);
+}
+
+.boards svg {
+  transition: transform 0.5s;
+}
+
+.boards:hover svg {
+  transform: scale(0.9);
+  fill: #333333;
+}
+
     </style>
-    <div class="container">
+
+
+    <div class="containerTop">
         <div class="row">
             <div class="col-12">
                 <h2>Welcome to your dashboard {{ user.username }} </h2>
+                <h3>Here you can view all your Boards</h3>
             </div>
         </div>
     </div>
+  </div>
+</div>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-4">
-                <h3>To do </h3>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+<!-- Django Auto Logout-->
+{{ redirect_to_login_immediately }}
 
-                    </div>
-                    <div class="panel-body">
-                            <!-- Currently just a template and there is no tasks currently stored-->
-                            {% comment %}
-                            {%for task in task_data  %}
-                            {%  endcomment %}
-                            <div class="row">
-                                <div class="col-6">
-                                    <h5>Name of task</h5>
-                                    {% comment %}
-                                    {{ task.taskName }}
-                                    {% endcomment %}
+{% endblock %}
 
-                                </div>
-                                <div class="col-6">
-                                    <h5>Due date</h5>
-                                    {% comment %}
-                                    {{ task.dueDate }}
-                                    {% endcomment %}
 
-                                </div>
-                            </div>
-                        </div>
-                </div>
+    <div class="container " class="boardsContainer">
+        <div class="row " class="boardsRow">
+            {% for board in boards %}
+            <div class="col-4" class="boardCont">
+                <a class ="boardLink" href= "{% url 'board' board.board_name %}"><button type="button" class="boards"  >{{ board.board_name }}</button></a>
             </div>
+            {% endfor %}
 
-            <div class="col-4">
-                <h3>In Progress</h3>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-
-                    </div>
-                    <div class="panel-body">
-                            <!-- Currently just a template and there is no tasks currently stored-->
-                            {% comment %}
-                            {%for task in task_data  %}
-                            {%  endcomment %}
-                            <div class="row">
-                                <div class="col-6">
-                                    <h5>Name of task</h5>
-                                    {% comment %}
-                                    {{ task.taskName }}
-                                    {% endcomment %}
-
-                                </div>
-                                <div class="col-6">
-                                    <h5>Due date</h5>
-                                    {% comment %}
-                                    {{ task.dueDate }}
-                                    {% endcomment %}
-
-                                </div>
-                            </div>
-                        </div>
-
-
-                </div>
-            </div>
-
-
-            <div class="col-4">
-                <h3>Completed</h3>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-
-                    </div>
-                    <div class="panel-body">
-                            <!-- Currently just a template and there is no tasks currently stored-->
-                            {% comment %}
-                            {%for task in task_data  %}
-                            {%  endcomment %}
-                            <div class="row">
-                                <div class="col-6">
-                                    <h5>Name of task</h5>
-                                    {% comment %}
-                                    {{ task.taskName }}
-                                    {% endcomment %}
-                                    <ul>
-                                        <li>Create Task Model</li>
-                                        <li>User story 3</li>
-                                        <li>User story 5</li>
-                                    </ul>
-
-                                </div>
-
-                                <div class="col-6" >
-                                    <h5>Due date</h5>
-                                    {% comment %}
-                                    {{ task.dueDate }}
-                                    {% endcomment %}
-                                    <ul>
-                                        <li>16/11/2023 17:53:24</li>
-                                        <li>16/11/2023 17:53:24</li>
-                                        <li>16/11/2023 17:53:24</li
-                                    </ul>
-                                </div>
-
-                            </div>
-                        </div>
-
-
-                </div>
-            </div>
         </div>
     </div>
 
