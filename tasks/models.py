@@ -98,19 +98,30 @@ class Teams():
        
     
 class Board(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
     BOARD_CHOICES = (('INVALID','Choose Type'),
-                    ('Private','Private'),
-                    ('Team','Team'),
-                    )
+                ('Private','Private'),
+                ('Team','Team'),
+                )
+    
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
         
     board_name = models.CharField(primary_key=True,
                                 max_length=30,
                                 unique=True,
+                                blank = False
                                 )
     
-    board_type = models.CharField(max_length=11,choices=BOARD_CHOICES,default='INVALID')
-    team_emails = models.TextField(default="Enter team emails here if necessary, seperated by commas.")
+    board_type = models.CharField(max_length=11,
+                                  choices=BOARD_CHOICES,
+                                  default='INVALID',
+                                  )
+    
+    team_emails = models.TextField(default="Enter team emails here if necessary, seperated by commas.", 
+                                 validators= [RegexValidator (
+                                     regex=r'^[\W]*([\w+\-.%]+@[\w\-.]+\.[A-Za-z]{2,4}[\W]*,{1}[\W]*)*([\w+\-.%]+@[\w\-.]+\.[A-Za-z]{2,4})[\W]*$',
+                                     message="Inputted emails are not valid."
+                                     )
+                                 ])
 
     team = models.ForeignKey(Teams, on_delete=models.CASCADE)
     

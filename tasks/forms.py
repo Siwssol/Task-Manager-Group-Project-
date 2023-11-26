@@ -132,19 +132,44 @@ class CreateBoardForm(forms.ModelForm):
         """Clean the data inputted by the user and generate a response if there are any errors."""
 
         super().clean()
+
+        board_name = self.cleaned_data.get('board_name')
+        board_name_result = self.checkBoard(board_name)
+        if(board_name_result):
+            self.add_error('board_name','Board name is empty.')
+            
         board_type = self.cleaned_data.get('board_type')
-
-        if board_type == 'INVALID':
-
-            self.add_error('board_type', 'Board Type is not valid. Please choose another type.')
-
+        board_type_result = self.checkBoardType(board_type)
+        if (board_type_result):
+            self.add_error('board_type','Select a valid option.')
+        
         team_members = self.cleaned_data.get('team_emails')
+        team_members_result = self.checkEmails(team_members,board_type)
+        if (team_members_result):
+            self.add_error('team_emails','Inputted emails is not valid')
 
-        if (team_members == "Enter team emails here if necessary, seperated by commas." and board_type == "Team"):
-            self.add_error('team_emails', 'Team emails is not valid.')
+    def checkBoard(self,board_name_to_analyse):
+        if (board_name_to_analyse is None):
+            return True
+        else:      
+            return False
+    
+    def checkBoardType(self,board_type_to_analyse):
+        if (board_type_to_analyse == "INVALID"):
+            return True
+        else:
+            return False
 
-        elif (team_members == "Enter team emails here if necessary, seperated by commas." and board_type == "INVALID"):
-            self.add_error('team_emails', 'Team emails is not valid.')
+    def checkEmails(self,team_emails_to_analyse,board_type_to_analyse):
+        if (board_type_to_analyse == 'Private'):
+            return False
+        elif (team_emails_to_analyse is None):
+            return True
+        else:
+            if (team_emails_to_analyse == "Enter team emails here if necessary, seperated by commas." and (board_type_to_analyse == 'INVALID' or board_type_to_analyse == 'Team')):
+                return True
+        return False
+
 
     def save(self):
         """ Create new board"""
