@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from datetime import timedelta
 from django.utils import timezone
+from django.urls import reverse
+
 
 class AutoSignOutTests(TestCase):
     def setUp(self):
@@ -46,10 +48,10 @@ class AutoSignOutTests(TestCase):
         
         def test_user_interactions_after_auto_sign_out(self):
         # Log in and simulate inactivity
-        self.client.login(username='testuser', password='12345')
-        session = self.client.session
-        session['last_activity'] = timezone.now() - timedelta(minutes=settings.AUTO_LOGOUT_DELAY_MINUTES + 1)
-        session.save()
+            self.client.login(username='testuser', password='12345')
+            session = self.client.session
+            session['last_activity'] = timezone.now() - timedelta(minutes=settings.AUTO_LOGOUT_DELAY_MINUTES + 1)
+            session.save()
 
         # Attempt to access a page after supposed auto sign-out
         response = self.client.get(reverse('some_view'))
