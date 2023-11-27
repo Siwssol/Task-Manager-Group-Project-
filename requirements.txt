@@ -14,5 +14,7 @@ sqlparse==0.4.4
 typing_extensions==4.8.0
 
 #For the auto log out feature
-django-auto-logout 0.5.1
+django-auto-logout==0.5.1
+
+
 
