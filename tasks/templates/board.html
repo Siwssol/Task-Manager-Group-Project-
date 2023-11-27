@@ -2,21 +2,66 @@
 <html lang="en">
 {% extends 'base_content.html' %}
 {% block content %}
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <div class="container " class="taskListContainer">
-        <div class="row" class="ListRow">
-        {% for list in lists %}
-            <div class = "col-4" class ="TaskLists">
-                <h1>{{ list.listName }}</h1>
-            </div>
-         {% endfor%}
+    <style>
+    .ListRow{
+        height: 520px;
+        position: relative;
+    }
+    @media (min-width: 500px) {
+        .TaskListCont {
+            width: 350px;
+            height: 500px;
+            border-radius: 10px;
+            background-color: lightgrey;
 
+        }
+    }
+
+    .TaskLists {
+        height:300px;
+    }
+
+    .TaskListName{
+        font-size: 35px;
+        padding-top: 25px;
+    }
+
+    .CreateTaskButton {
+        margin: 0;
+        position: absolute;
+        left: 50%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+    }
+
+    .CreateTaskButton,.TaskListName, .ListRow {
+        justify-content: center;
+        display: flex;
+    }
+
+    </style>
+<body>
+    <div class="container taskListContainer">
+        <div class="row ListRow">
+        {% for list in lists %}
+            <div class = "col-4 TaskLists">
+                <div class="container TaskListCont">
+                    <h1 class="TaskListName">{{ list.listName }}</h1>
+
+                </div>
+
+            </div>
+
+         {% endfor%}
+        </div>
+
+        <div class= "row CreateButRow">
+            <a class = "CreateTaskLink" href = "{% url 'createTask' %}">
+                <button type="button" class="CreateTaskButton">Add New Task</button>
+            </a>
         </div>
     </div>
+
 
 </body>
 

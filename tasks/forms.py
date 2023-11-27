@@ -2,8 +2,7 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.core.validators import RegexValidator
-
-from .models import User, Board
+from .models import User, Board, Task
 
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
@@ -110,17 +109,14 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         return user
 
     
-
+"""
 class EditTaskNameForm(forms.ModelForm):
-
     task_id = forms.IntegerField()
-    new_name = forms.CharField(max_length=50, blank=False)
-
-
+    new_name = forms.CharField(max_length=50, blank=False, required=True)
+"""
 
 class CreateBoardForm(forms.ModelForm):
     """Form enabling user to create a board"""
-    
 
     class Meta:
         """Board Form Options"""
@@ -156,4 +152,35 @@ class CreateBoardForm(forms.ModelForm):
             team_emails=self.cleaned_data.get('team_emails'),
         )
 
-            
+
+"""Form to create Task"""
+class CreateTaskForm(forms.ModelForm):
+    class Meta:
+
+        model = Task
+        fields = ["task_name", "task_description", "due_date", "status"]
+
+    def clean(self):
+        super().clean()
+
+        if self.cleaned_data.get("task_name") == "INVALID" and self.cleaned_data.get("task_name") is None:
+            self.add_error("Task name cannot be blank")
+
+        elif self.cleaned_data.get("task_name") == "INVALID" and len(self.cleaned_data.get("task_name")) > 50:
+            self.add_error("Task name length cannot exceed 50")
+
+        if self.cleaned_data.get("due_date") == "INVALID":
+            self.add_error("Please enter a valid due date")
+
+        if self.cleaned_data.get("status") == "INVALID":
+            self.add_error("Please enter a valid status")
+
+    def save(self):
+        """Creates Task"""
+        super().save(commit=False)
+        task = Task.objects.create_task(
+            task_name = self.cleaned_data.get('task_name'),
+            task_description = self.cleaned_data.get('task_description'),
+            status = self.cleaned_data.get('status'),
+            due_date = self.cleaned_data.get('due_date')
+        )

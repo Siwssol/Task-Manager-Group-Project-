@@ -10,10 +10,9 @@ from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
-from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm
+from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm
 from tasks.helpers import login_prohibited
-from .forms import EditTaskNameForm, EditTaskDescriptionForm
-from .models import Board, TaskList
+from .models import Board, TaskList, Task
 
 
 @login_required
@@ -37,24 +36,6 @@ def create_board_view(request):
             board_type = form.cleaned_data.get('board_type')
             board_members = form.cleaned_data.get('team_emails')
             board = Board.objects.create(author=current_user, board_name = board_name, board_type=board_type, team_emails = board_members)
-            return render(request,'dashboard.html',{'user':current_user})
-        else:
-            return render(request, 'create_board.html', {'form':form})
-    else:
-        return render(request, 'create_board.html', {'form':form})
-
-@login_required
-def create_board_view(request):
-    """ Display board creation screen"""
-    form = CreateBoardForm()
-    if request.method == 'POST':
-        current_user = request.user
-        form = CreateBoardForm(request.POST)
-        if form.is_valid():
-            board_name = form.cleaned_data.get('board_name')
-            board_type = form.cleaned_data.get('board_type')
-            board_members = form.cleaned_data.get('team_emails')
-            board = Board.objects.create(author=current_user, board_name = board_name, board_type=board_type, team_emails = board_members)
             TaskList.objects.create(board = board, listName="To Do")
             TaskList.objects.create(board = board, listName="In Progress")
             TaskList.objects.create(board = board, listName="Completed")
@@ -64,6 +45,24 @@ def create_board_view(request):
             return render(request, 'create_board.html', {'form':form})
     else:
         return render(request, 'create_board.html', {'form':form})
+
+
+"""Display the Task Creation screen"""
+def createTaskView(request):
+    """
+    taskList = Task.objects.get(pk = taskListID)
+    form = CreateTaskForm()
+    if request.method == 'POST':
+        current_user = request.user
+        form = CreateTaskForm(request.POST)
+        # Need to finish
+
+        if form.is_valid():
+
+    else:
+    """
+    return render(request, 'createTask.html')
+
 
 @login_prohibited
 def home(request):
@@ -202,7 +201,7 @@ class SignUpView(LoginProhibitedMixin, FormView):
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
-    
+"""
 def change_task_name(request):
     if request.method == 'POST':
         form = EditTaskNameForm(request.POST)
@@ -213,12 +212,12 @@ def change_task_name(request):
 
             # Perform the task update logic 
             Task.objects.filter(id=task_id).update(task_name=new_name)
-
             
     else:
         form = EditTaskNameForm()
 
     return render(request, 'change_task_name.html', {'form': form})    
+
 
 def change_task_description(request):
     if request.method == 'POST':
@@ -236,7 +235,7 @@ def change_task_description(request):
         form = EditTaskDescriptionForm()
 
     return render(request, 'change_task_description.html', {'form': form})  
-
+"""
 
 
 
