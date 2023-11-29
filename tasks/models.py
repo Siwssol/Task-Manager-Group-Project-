@@ -110,14 +110,11 @@ class TaskList(models.Model):
 
 class Task(models.Model):
 
-
     """Model used for creating tasks, with attached parameters."""
     # Links the task model to the list
     list = models.ForeignKey(TaskList, on_delete=models.CASCADE)
     #Defines the name
     task_name = models.CharField(max_length=50, blank=False)
-    # Defines the status
-    status = models.CharField(max_length=50, blank=False)
     # Defines the description
     task_description = models.TextField(max_length=1000)
     #Defines the due Date

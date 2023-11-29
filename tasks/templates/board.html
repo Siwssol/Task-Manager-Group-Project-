@@ -13,7 +13,6 @@
             height: 500px;
             border-radius: 10px;
             background-color: lightgrey;
-
         }
     }
 
@@ -26,17 +25,14 @@
         padding-top: 25px;
     }
 
-    .CreateTaskButton {
-        margin: 0;
-        position: absolute;
-        left: 50%;
-        -ms-transform: translateY(-50%);
-        transform: translateY(-50%);
-    }
 
     .CreateTaskButton,.TaskListName, .ListRow {
         justify-content: center;
         display: flex;
+    }
+
+    .CreateTaskLink{
+        text-decoration: none !important;
     }
 
     </style>
@@ -47,19 +43,39 @@
             <div class = "col-4 TaskLists">
                 <div class="container TaskListCont">
                     <h1 class="TaskListName">{{ list.listName }}</h1>
-
+                    {% for task in tasks %}
+                        {% if task.list_id == list.id %}
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <button type="button" data-bs-toggle="collapse" data-bs-target="#taskDescription{{ task.id }}" aria-expanded="false" aria-controls="TaskDescription">{{ task.task_name }}</button>
+                                </div>
+                                <div id="taskDescription{{ task.id }}" class="collapse">
+                                    <div class="panel-body">
+                                        <p>{{ task.task_description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
 
+                <footer>
+                    {% if list.id %}
+                        <a class="CreateTaskLink" href="{% url 'createTask' taskListID=list.id board_name=request.resolver_match.kwargs.board_name %}">
+                            <button type="button" class="CreateTaskButton">Add New Task to {{ list.listName }}</button>
+                        </a>
+                    {% else %}
+                        <p>Error: Invalid taskListID for {{ list.listName }}</p>
+                    {% endif %}
+                </footer>
+
             </div>
+
 
          {% endfor%}
         </div>
 
-        <div class= "row CreateButRow">
-            <a class = "CreateTaskLink" href = "{% url 'createTask' %}">
-                <button type="button" class="CreateTaskButton">Add New Task</button>
-            </a>
-        </div>
+
     </div>
 
 

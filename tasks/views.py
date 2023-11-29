@@ -48,33 +48,60 @@ def create_board_view(request):
 
 
 """Display the Task Creation screen"""
-def createTaskView(request):
-    """
-    taskList = Task.objects.get(pk = taskListID)
+def createTaskView(request, taskListID, board_name):
+    print(taskListID)
+    taskList = TaskList.objects.get(pk = taskListID)
     form = CreateTaskForm()
+
+    print(request.method)
     if request.method == 'POST':
         current_user = request.user
         form = CreateTaskForm(request.POST)
-        # Need to finish
-
+        # print("Have entered this if statement")
         if form.is_valid():
-
+            #print("Task created")
+            task_name = form.cleaned_data.get('task_name')
+            task_description = form.cleaned_data.get('task_description')
+            due_date = form.cleaned_data.get('due_date')
+            lists = TaskList.objects.all().filter(board=board_name)
+            task = Task.objects.create(list = taskList, task_name = task_name, task_description = task_description, due_date = due_date)
+            #print(task.task_name, task.task_description)
+            tasksList = []
+            for list in lists:
+                tasks = Task.objects.all().filter(list=list)
+                for task in tasks:
+                    print(task)
+                    tasksList.append(task)
+            """Debugging print statements
+            for task in tasks:
+                print(task.task_name)
+            for list in lists:
+                print(list)
+            """
+            return render(request, 'board.html',{'user': current_user,'lists': lists, 'tasks': tasksList})
+        else:
+            return render(request, 'createTask.html', {'form': form})
     else:
-    """
-    return render(request, 'createTask.html')
+        return render(request, 'createTask.html', {'form':form})
 
 
 @login_prohibited
 def home(request):
     """Display the application's start/home screen."""
-
     return render(request, 'home.html')
 
-  
 def board(request, board_name):
     """Display specific board"""
+    current_user = request.user
     lists = TaskList.objects.all().filter(board = board_name)
-    return render(request, 'board.html', {'lists': lists})
+    tasksList = []
+    for list in lists:
+        tasks = Task.objects.all().filter(list = list)
+        for task in tasks:
+            print(task)
+            tasksList.append(task)
+
+    return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""

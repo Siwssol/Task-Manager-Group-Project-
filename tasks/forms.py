@@ -2,6 +2,8 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.core.validators import RegexValidator
+from django.contrib.admin.widgets import AdminDateWidget
+from django.forms.fields import DateField
 from .models import User, Board, Task
 
 class LogInForm(forms.Form):
@@ -87,6 +89,7 @@ class PasswordForm(NewPasswordMixin):
         return self.user
 
 
+
 class SignUpForm(NewPasswordMixin, forms.ModelForm):
     """Form enabling unregistered users to sign up."""
 
@@ -158,22 +161,21 @@ class CreateTaskForm(forms.ModelForm):
     class Meta:
 
         model = Task
-        fields = ["task_name", "task_description", "due_date", "status"]
+        fields = ["task_name", "task_description", "due_date"]
+
+    due_date = forms.DateField(widget = forms.SelectDateWidget())
 
     def clean(self):
-        super().clean()
+        cleaned_data = super().clean()
+        task_name = cleaned_data.get("task_name")
+        if not task_name:
+            self.add_error("task_name", "Task name cannot be blank")
+        elif len(task_name) > 50:
+            self.add_error("task_name", "Task name length cannot exceed 50")
 
-        if self.cleaned_data.get("task_name") == "INVALID" and self.cleaned_data.get("task_name") is None:
-            self.add_error("Task name cannot be blank")
-
-        elif self.cleaned_data.get("task_name") == "INVALID" and len(self.cleaned_data.get("task_name")) > 50:
-            self.add_error("Task name length cannot exceed 50")
-
-        if self.cleaned_data.get("due_date") == "INVALID":
-            self.add_error("Please enter a valid due date")
-
-        if self.cleaned_data.get("status") == "INVALID":
-            self.add_error("Please enter a valid status")
+        due_date = cleaned_data.get("due_date")
+        if not due_date:
+            self.add_error("due_date", "Please enter a valid due date")
 
     def save(self):
         """Creates Task"""
@@ -181,6 +183,7 @@ class CreateTaskForm(forms.ModelForm):
         task = Task.objects.create_task(
             task_name = self.cleaned_data.get('task_name'),
             task_description = self.cleaned_data.get('task_description'),
-            status = self.cleaned_data.get('status'),
             due_date = self.cleaned_data.get('due_date')
         )
+        task.save()
+        return task
