@@ -2,21 +2,82 @@
 <html lang="en">
 {% extends 'base_content.html' %}
 {% block content %}
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <div class="container " class="taskListContainer">
-        <div class="row" class="ListRow">
-        {% for list in lists %}
-            <div class = "col-4" class ="TaskLists">
-                <h1>{{ list.listName }}</h1>
-            </div>
-         {% endfor%}
+    <style>
+    .ListRow{
+        height: 520px;
+        position: relative;
+    }
+    @media (min-width: 500px) {
+        .TaskListCont {
+            width: 350px;
+            height: 500px;
+            border-radius: 10px;
+            background-color: lightgrey;
+        }
+    }
 
+    .TaskLists {
+        height:300px;
+    }
+
+    .TaskListName{
+        font-size: 35px;
+        padding-top: 25px;
+    }
+
+
+    .CreateTaskButton,.TaskListName, .ListRow {
+        justify-content: center;
+        display: flex;
+    }
+
+    .CreateTaskLink{
+        text-decoration: none !important;
+    }
+
+    </style>
+<body>
+    <div class="container taskListContainer">
+        <div class="row ListRow">
+        {% for list in lists %}
+            <div class = "col-4 TaskLists">
+                <div class="container TaskListCont">
+                    <h1 class="TaskListName">{{ list.listName }}</h1>
+                    {% for task in tasks %}
+                        {% if task.list_id == list.id %}
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <button type="button" data-bs-toggle="collapse" data-bs-target="#taskDescription{{ task.id }}" aria-expanded="false" aria-controls="TaskDescription">{{ task.task_name }}</button>
+                                </div>
+                                <div id="taskDescription{{ task.id }}" class="collapse">
+                                    <div class="panel-body">
+                                        <p>{{ task.task_description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <footer>
+                    {% if list.id %}
+                        <a class="CreateTaskLink" href="{% url 'createTask' taskListID=list.id board_name=request.resolver_match.kwargs.board_name %}">
+                            <button type="button" class="CreateTaskButton">Add New Task to {{ list.listName }}</button>
+                        </a>
+                    {% else %}
+                        <p>Error: Invalid taskListID for {{ list.listName }}</p>
+                    {% endif %}
+                </footer>
+
+            </div>
+
+
+         {% endfor%}
         </div>
+
+
     </div>
+
 
 </body>
 
