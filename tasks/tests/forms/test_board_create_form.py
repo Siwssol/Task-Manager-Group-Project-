@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django.urls import reverse
+from tasks.forms import CreateBoardForm
 from tasks.models import Board, User
 
 class NewBoardTest(TestCase):
@@ -10,46 +10,85 @@ class NewBoardTest(TestCase):
     ]
 
     def setUp(self):
-        super(TestCase,self).setUp()
-        self.user = User.objects.get(username='@johndoe')
-        self.url = reverse('create_board')
-        self.data = {'board_name' : "Board 1", 'board_type' : "Private", 'board_members' : "Enter team emails here if necessary, seperated by commas."}
-    
-    def test_create_new_board_url(self):
-        self.assertEqual(self.url, '/create_board/')
 
-    def test_successful_new_board(self):
-        self.client.login(username=self.user.username, password="Password123")
-        user_count_before = Board.objects.count()
-        response = self.client.post(self.url, self.data,follow=True)
-        user_count_after = Board.objects.count()
-        self.assertEqual(user_count_before+1,user_count_after)
-        new_board = Board.objects.count()
-        self.assertEqual(self.user, new_board.author)
-        response_url = reverse('feed')
-        self.assertRedirects(
-            response, response_url,
-            status_code=302, target_status_code=200,
-            fetch_redirect_response=True
-        )
-        self.assertTemplateUsed(response,'feed.html')
+        self.form_input = {'board_name' : "Board 1", 
+                           'board_type' : "Private",
+                            'board_members' : "Enter team emails here if necessary, seperated by commas.",
+                            }
     
-    def test_unsuccessful_new_board(self):
-        self.client.login(username='@johndoe',password='Password123')
-        user_count_before = Board.objects.count()
-        self.data['board_name'] = ""
-        response = self.client.post(self.url,self.data, follow=True)
-        user_count_after = Board.objects.count()
-        self.assertEqual(user_count_after,user_count_before)
-        self.assertTemplateUsed(response, 'create_board')
+    def test_valid_board_form(self):
+        form = CreateBoardForm(data=self.form_input)
+        self.assertTrue(form.is_valid())
     
-    def test_cannot_create_board_for_other_user(self):
-        self.client.login(username='@johndoe',password='Password123')
-        other_user = User.objects.get(username='@johndoe')
-        self.data['author'] = other_user.id
-        user_count_before = Board.objects.count()
-        response = self.client.post(self.url, self.data, follow=True)
-        user_count_after = Board.objects.count()
-        self.assertEqual(user_count_before+1,user_count_after)
-        new_board = Board.objects.latest('created_at')
-        self.assertEqual(self.user, new_board.author)
+    def test_board_has_necessary_fields(self):
+        form = CreateBoardForm()
+        self.assertIn('board_name',form.fields)
+        self.assertIn('board_type',form.fields)
+        self.assertIn('board_members',form.fields)
+    
+    def test_board_name_must_not_be_empty(self):
+        self.form_input['board_name'] = ""
+        form = CreateBoardForm(data = self.form_input)
+        self.assertFalse(form.is_valid())
+    
+    def test_board_type_must_not_be_invalid(self):
+        self.form_input['board_type'] = 'INVALID'
+        form = CreateBoardForm(data = self.form_input)
+        self.assertFalse(form.is_valid())
+    
+    def test_board_name_must_not_be_empty_characters(self):
+        self.form_input['board_name'] = "   "
+        form = CreateBoardForm(data = self.form_input)
+        self.assertFalse(form.is_valid())
+    
+    def test_board_members_must_not_be_placeholder_text_if_user_selects_team(self):
+        self.form_input['board_type'] = 'Team'
+        form = CreateBoardForm(data = self.form_input)
+        self.assertFalse(form.is_valid())
+    
+    def test_board_members_must_not_be_empty_if_board_type_is_team(self):
+        self.form_input['board_type'] = 'Team'
+        self.form_input['board_members'] = ""
+        form = CreateBoardForm(data = self.form_input)
+        self.assertFalse(form.is_valid())
+    
+    def test_board_members_must_not_consist_of_just_whitespace_if_board_type_is_team(self):
+        self.form_input['board_type'] = 'Team'
+        self.form_input['board_members'] = " "
+        form = CreateBoardForm(data = self.form_input)
+        self.assertFalse(form.is_valid())
+    
+    def test_board_members_must_not_consist_of_valid_and_invalid_emails(self):
+        self.form_input['board_type'] = 'Team'
+        self.form_input['board_members'] = "abcd@gmail.com, abcd123@gmail.com, loremipsusmori"
+        form = CreateBoardForm(data = self.form_input)
+        self.assertFalse(form.is_valid())        
+
+    def test_board_valid_if_user_selects_private_team_type_and_leaves_empty_members_text(self):
+        self.form_input['board_members'] = ""
+        form = CreateBoardForm(data = self.form_input)
+        self.assertTrue(form.is_valid())
+    
+    def test_board_valid_if_user_selects_private_team_type_and_puts_whitespace_in_members_text(self):
+        self.form_input['board_members'] = " "
+        form = CreateBoardForm(data = self.form_input)
+        self.assertTrue(form.is_valid())
+    
+    def test_board_valid_if_user_selects_private_team_type_and_puts_any_text_in_members(self):
+        self.form_input['board_members'] = "lorem ipsus mori"
+        form = CreateBoardForm(data = self.form_input)
+        self.assertTrue(form.is_valid())
+    
+    def test_board_valid_if_user_selects_team_team_type_and_enters_valid_emails(self):
+        self.form_input['board_type'] = 'Team'
+        self.form_input['board_members'] = 'abcd@gmail.com'
+        form = CreateBoardForm(data = self.form_input)
+        self.assertTrue(form.is_valid())
+    
+    def test_board_valid_if_user_selects_team_team_type_and_enters_multiple_valid_emails(self):
+        self.form_input['board_type'] = 'Team'
+        self.form_input['board_members'] = 'abcd@gmail.com, abcd1@gmail.com, abcd2@gmail.com'
+        form = CreateBoardForm(data = self.form_input)
+        self.assertTrue(form.is_valid())
+
+

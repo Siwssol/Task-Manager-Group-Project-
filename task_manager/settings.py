@@ -54,6 +54,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    #django auto Logout (1)
+    'django_auto_logout.middleware.auto_logout'
 ]
 
 ROOT_URLCONF = 'task_manager.urls'
@@ -69,6 +72,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
+                #Django auto Logout
+                'django_auto_logout.context_processors.auto_logout_client',
             ],
         },
     },
@@ -147,3 +153,9 @@ REDIRECT_URL_WHEN_LOGGED_IN = 'dashboard'
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
+
+#Django session timeout
+
+AUTO_LOGOUT = {'IDLE_TIME': 600, 'REDIRECT_TO_LOGIN_IMMEDIATELY': True, 
+               'MESSAGE': 'The session has expired. Please login again to continue.',}
+
