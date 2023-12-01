@@ -54,6 +54,7 @@ def createTaskView(request, taskListID, board_name):
     form = CreateTaskForm()
 
     print(request.method)
+    # TEMP COMMENT
     if request.method == 'POST':
         current_user = request.user
         form = CreateTaskForm(request.POST)
