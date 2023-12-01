@@ -110,12 +110,18 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
             password=self.cleaned_data.get('new_password'),
         )
         return user
-    
-"""
+
 class EditTaskNameForm(forms.ModelForm):
     task_id = forms.IntegerField()
     new_name = forms.CharField(max_length=50, blank=False, required=True)
-"""
+
+class EditTaskDescriptionForm(forms.ModelForm):
+    """Form enabling users to change the task description."""
+
+    #these IDs are compared against the primary key
+    task_id = forms.IntegerField()
+    new_description = forms.CharField(max_length=50)
+
 
 class CreateBoardForm(forms.ModelForm):
     """Form enabling user to create a board"""

@@ -10,15 +10,15 @@ from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
-from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm
+from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm
 from tasks.helpers import login_prohibited
-from .forms import EditTaskNameForm, EditTaskDescriptionForm
+from tasks.models import Board, TaskList, User, Teams, Task
 
 @login_required
 def dashboard(request):
     """Display the current user's dashboard."""
     current_user = request.user
-    current_boards = Board.objects.all()
+    current_boards = Board.objects.all().filter(author=current_user)
     for i in current_boards:
         print(i)
     return render(request, 'dashboard.html', {'user': current_user, 'boards' : current_boards})
@@ -37,13 +37,15 @@ def create_board_view(request):
             """ Create Team based on user input"""
             emails = form.emails_to_python()
             if board_type == 'Team':
-                created_team = Teams.objects.create(author = current_user, members = current_user, permission_level = 1)
+                created_team = Teams.objects.create(author = current_user)
+                created_team.members.add(current_user)
                 for em in emails:
                     usr = User.objects.get(email = em)
                     created_team.members.add(usr)
             else:
                 """A private team will have a single member team. This could allow for future ability to implement change from private -> team """
-                single_member_team = Teams.objects.create(author = current_user, members = current_user)
+                created_team = Teams.objects.create(author = current_user)
+                created_team.members.add(current_user)
             board = Board.objects.create(author=current_user, board_name = board_name,
                                           board_type=board_type, team_emails = board_members,
                                           team = created_team)
@@ -241,7 +243,7 @@ class SignUpView(LoginProhibitedMixin, FormView):
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
-"""
+
 def change_task_name(request):
     if request.method == 'POST':
         form = EditTaskNameForm(request.POST)
@@ -251,7 +253,7 @@ def change_task_name(request):
             new_name = form.cleaned_data['new_name']
 
             # Perform the task update logic 
-            Task.objects.filter(id=task_id).update(task_name=new_name
+            Task.objects.filter(id=task_id).update(task_name=new_name)
             
     else:
         form = EditTaskNameForm()
@@ -274,5 +276,5 @@ def change_task_description(request):
         form = EditTaskDescriptionForm()
 
     return render(request, 'change_task_description.html', {'form': form})  
-"""
+
 
