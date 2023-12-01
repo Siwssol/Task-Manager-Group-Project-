@@ -20,30 +20,11 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
 
-                    </div>
-                    <div class="panel-body">
-                            <!-- Currently just a template and there is no tasks currently stored-->
-                            {% comment %}
-                            {%for task in task_data  %}
-                            {%  endcomment %}
-                            <div class="row">
-                                <div class="col-6">
-                                    <h5>Name of task</h5>
-                                    {% comment %}
-                                    {{ task.taskName }}
-                                    {% endcomment %}
-
-                                </div>
-                                <div class="col-6">
-                                    <h5>Due date</h5>
-                                    {% comment %}
-                                    {{ task.dueDate }}
-                                    {% endcomment %}
-
-                                </div>
-                            </div>
-                        </div>
-                </div>
+    <div class="container " class="boardsContainer">
+        <div class="row " class="boardsRow">
+            {% for board in boards %}
+            <div class="col-4" class="boardCont">
+                <a class ="boardLink" href= "{% url 'board' board.board_name %}"><button type="button" class="boards"  >{{ board.board_name }}</button></a>
             </div>
 
             <div class="col-4">

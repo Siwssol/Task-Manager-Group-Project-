@@ -12,7 +12,9 @@ from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
 from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm
 from tasks.helpers import login_prohibited
-from .models import Board
+from .forms import EditTaskNameForm, EditTaskDescriptionForm
+from .models import Board, TaskList, User, Teams
+
 
 @login_required
 def dashboard(request):
@@ -32,8 +34,24 @@ def create_board_view(request):
             board_name = form.cleaned_data.get('board_name')
             board_type = form.cleaned_data.get('board_type')
             board_members = form.cleaned_data.get('team_emails')
-            board = Board.objects.create(author=current_user, board_name = board_name, board_type=board_type, team_emails = board_members)
-            return render(request,'dashboard.html',{'user':current_user})
+            """ Create Team based on user input"""
+            emails = form.emails_to_python()
+            if board_type == 'Team':
+                created_team = Teams.objects.create(author = current_user, members = current_user, permission_level = 1)
+                for em in emails:
+                    usr = User.objects.get(email = em)
+                    created_team.members.add(usr)
+            else:
+                """A private team will have a single member team. This could allow for future ability to implement change from private -> team """
+                single_member_team = Teams.objects.create(author = current_user, members = current_user)
+            board = Board.objects.create(author=current_user, board_name = board_name,
+                                          board_type=board_type, team_emails = board_members,
+                                          team = created_team)
+            TaskList.objects.create(board = board, listName="To Do")
+            TaskList.objects.create(board = board, listName="In Progress")
+            TaskList.objects.create(board = board, listName="Completed")
+            boards = Board.objects.all()
+            return render(request,'dashboard.html',{'user':current_user, 'boards': boards})
         else:
             return render(request, 'create_board.html', {'form':form})
     else:
@@ -169,3 +187,38 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+def change_task_name(request):
+    if request.method == 'POST':
+        form = EditTaskNameForm(request.POST)
+        if form.is_valid():
+            # Process the form data 
+            task_id = form.cleaned_data['task_id']
+            new_name = form.cleaned_data['new_name']
+
+            # Perform the task update logic 
+            Task.objects.filter(id=task_id).update(task_name=new_name)
+
+            
+    else:
+        form = EditTaskNameForm()
+
+    return render(request, 'change_task_name.html', {'form': form})    
+
+def change_task_description(request):
+    if request.method == 'POST':
+        form = EditTaskDescriptionForm(request.POST)
+        if form.is_valid():
+            # Process the form data 
+            task_id = form.cleaned_data['task_id']
+            new_description = form.cleaned_data['new_description']
+
+            # Perform the task update logic 
+            Task.objects.filter(id=task_id).update(task_name=new_description)
+
+            
+    else:
+        form = EditTaskDescriptionForm()
+
+    return render(request, 'change_task_description.html', {'form': form})  
+

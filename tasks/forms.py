@@ -2,7 +2,7 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.core.validators import RegexValidator
-from .models import User,Board
+from .models import User, Board, Teams
 
 
 class LogInForm(forms.Form):
@@ -109,6 +109,16 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         )
         return user
 
+class EditTaskNameForm(forms.ModelForm):
+
+    task_id = forms.IntegerField()
+    new_name = forms.CharField(max_length=50)
+
+class EditTaskDescriptionForm(forms.ModelForm):
+
+    task_id = forms.IntegerField()
+    new_description = forms.CharField(max_length=50)
+
 class CreateBoardForm(forms.ModelForm):
     """Form enabling user to create a board"""
     
@@ -116,32 +126,79 @@ class CreateBoardForm(forms.ModelForm):
         """Board Form Options"""
 
         model = Board
-        fields = ['board_name','board_type','team_emails']
+        fields = ['board_name', 'board_type', 'team_emails']
+
+    def emails_to_python(self):
+        user_emails = self.cleaned_data.get('team_emails')
+        user_emails = user_emails.split(",")
+        return user_emails
     
+    def emails_exist_in_database(self):
+        user_emails = self.emails_to_python()
+        doesntExist = False
+        for usr in user_emails:
+            if (doesntExist):
+                break
+            try:
+                User.objects.get(email = usr) 
+            except User.DoesNotExist:
+                doesntExist = True
+        return doesntExist
+
+
     def clean(self):
         """Clean the data inputted by the user and generate a response if there are any errors."""
 
         super().clean()
-        board_type = self.cleaned_data.get('board_type')
 
-        if board_type == 'INVALID':
-            self.add_error('board_type','Board Type is not valid. Please choose another type.')
+        board_name = self.cleaned_data.get('board_name')
+        board_name_result = self.checkBoard(board_name)
+        if(board_name_result):
+            self.add_error('board_name','Board name is empty.')
+            
+        board_type = self.cleaned_data.get('board_type')
+        board_type_result = self.checkBoardType(board_type)
+        if (board_type_result):
+            self.add_error('board_type','Select a valid option.')
         
         team_members = self.cleaned_data.get('team_emails')
-        
-        if (team_members == "Enter team emails here if necessary, seperated by commas." and board_type == "Team"):
-            self.add_error('team_emails','Team emails is not valid.')
+        team_members_result = self.checkEmails(team_members,board_type)
+        allEmailsExist = self.emails_exist_in_database()
+        ems = self.emails_to_python()
+        if (team_members_result):
+            self.add_error('team_emails',ems[0] + str(allEmailsExist))
 
-        elif (team_members == "Enter team emails here if necessary, seperated by commas." and board_type == "INVALID"):
-            self.add_error('team_emails','Team emails is not valid.')
+    def checkBoard(self,board_name_to_analyse):
+        if (board_name_to_analyse is None):
+            return True
+        else:      
+            return False
+    
+    def checkBoardType(self,board_type_to_analyse):
+        if (board_type_to_analyse == "INVALID"):
+            return True
+        else:
+            return False
 
-            
+    def checkEmails(self,team_emails_to_analyse,board_type_to_analyse):
+        if (board_type_to_analyse == 'Private'):
+            return False
+        else:
+            if (team_emails_to_analyse is None):
+                return True
+            elif (team_emails_to_analyse == "Enter team emails here if necessary, seperated by commas." and (board_type_to_analyse == 'INVALID' or board_type_to_analyse == 'Team')):
+                return True
+            else:
+                return self.emails_exist_in_database()
+        return False
+
+
     def save(self):
         """ Create new board"""
         super().save(commit=False)
-        Board = Board.objects.create_board(
+        board = Board.objects.create_board(
             self.cleaned_data.get('author'),
-            board_name = self.cleaned_data.get('board_name'),
-            board_type = self.cleaned_data.get('board_type'),
-            team_emails = self.cleaned_data.get('team_emails'),
+            board_name=self.cleaned_data.get('board_name'),
+            board_type=self.cleaned_data.get('board_type'),
+            team_emails=self.cleaned_data.get('team_emails'),
         )
