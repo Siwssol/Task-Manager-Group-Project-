@@ -101,9 +101,6 @@ class Teams(models.Model):
         pos = self.teammembers(user)
         return self.teampermissions[pos]
 
-    class Meta:
-        managed = False
-
         
 class Board(models.Model):
     BOARD_CHOICES = (('INVALID','Choose Type'),
