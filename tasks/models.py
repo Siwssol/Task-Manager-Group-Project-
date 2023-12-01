@@ -44,7 +44,7 @@ class User(AbstractUser):
         return self.gravatar(size=60)
 
 
-class Teams():
+class Teams(models.Model):
     """initialises the teams and shows what type of permissions there are """
     permissions = ['owner', 'admin', 'member', 'guest']
     def __init__(self):
@@ -124,7 +124,7 @@ class Board(models.Model):
     def invite(self , name, perm):
         self.team.invite_user(name, perm)
 
-    def removemember(self,user):
+    def removeuser(self , user):
         self.remove_user(user)
 
 

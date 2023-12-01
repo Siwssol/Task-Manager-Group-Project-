@@ -13,7 +13,7 @@ from django.urls import reverse
 from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm
 from tasks.helpers import login_prohibited
 from .forms import EditTaskNameForm, EditTaskDescriptionForm
-from .models import Board, TaskList
+from .models import Board, TaskList, Teams, Task
 
 
 @login_required
@@ -185,6 +185,8 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         """Return redirect URL after successful update."""
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+
 
 
 class SignUpView(LoginProhibitedMixin, FormView):
