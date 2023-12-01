@@ -44,6 +44,7 @@ class User(AbstractUser):
 
         return self.gravatar(size=60)
 
+      
 class Teams(models.Model):
     """initialises the teams and shows what type of permissions there are """
     class Permissions(models.IntegerChoices):
@@ -55,11 +56,6 @@ class Teams(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     members = models.ManyToManyField(User, related_name='team_member')
     permission_level = models.IntegerField(choices=Permissions.choices, default = 4)
-
-    permissions = ['owner', 'admin', 'member', 'guest']
-    # def __init__(self)
-    #     self.teammembers = []
-    #     self.teampermissions = []
         
     """function for adding a user to the team"""
     def add_user(self, user):
@@ -95,8 +91,6 @@ class Teams(models.Model):
             if self.teampermissions[pos] != 'owner':
                 self.teampermissions[pos] = str.lower()
 
-    class Meta:
-        managed = False
     def remove_user(self, user):
         pos = self.teammembers(user)
         if self.teampermissions[pos]!= 'owner':
@@ -106,19 +100,19 @@ class Teams(models.Model):
     def access_perms(self,user):
         pos = self.teammembers(user)
         return self.teampermissions[pos]
-    
-    def check_user(self,user):
-        pass
 
+    class Meta:
+        managed = False
 
-
+        
 class Board(models.Model):
     BOARD_CHOICES = (('INVALID','Choose Type'),
                 ('Private','Private'),
                 ('Team','Team'),
                 )
     
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='auth')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, 
+                               related_name='auth')
         
     board_name = models.CharField(primary_key=True,
                                 max_length=30,
@@ -131,49 +125,9 @@ class Board(models.Model):
                                   default='INVALID',
                                   )
     
-    team_emails = models.TextField(default="Enter team emails here if necessary, seperated by commas.", 
-                                 )
-    
-    team = models.OneToOneField(Teams,on_delete = models.CASCADE)
-    
-    def initialiseteam(self):
-        team_users = self.team_emails.split(',')
-        for email in team_users:
-            usernames = email.split('@')
-            username = '@' + usernames[0]
-            self.team.add_user(username)
-    
-    def invite(self , name, perm):
-        self.team.invite_user(name, perm)
-
-    def removemember(self,user):
-        self.remove_user(user)
-
-
-class Board(models.Model):
-    BOARD_CHOICES = (('INVALID','Choose Type'),
-                ('Private','Private'),
-                ('Team','Team'),
-                )
-    
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='auth')
-        
-    board_name = models.CharField(primary_key=True,
-                                max_length=30,
-                                unique=True,
-                                blank = False
-                                )
-    
-    board_type = models.CharField(max_length=11,
-                                  choices=BOARD_CHOICES,
-                                  default='INVALID',
+    team_emails = models.TextField(default="Enter team emails here if necessary, seperated by commas.",
                                   )
-    
-    team_emails = models.TextField(default="Enter team emails here if necessary, seperated by commas.", 
-                                 )
-    
     team = models.OneToOneField(Teams,on_delete = models.CASCADE)
-    #ManyToManyField(User,through='Teams',through_fields=('board','member'))
     
     def initialiseteam(self):
         team_users = self.team_emails.split(',')
@@ -194,21 +148,13 @@ class TaskList(models.Model):
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
     listName = models.CharField(max_length=50, blank=False)
 
-"""Each task will be stored in a certain list, so we need to keep track on which list the task is in"""
-class List(models.Model):
-    """ board = models.ForeignKey(Board, on_delete=models.CASCADE()) """
-    #listName = models.CharField(max_length=50, blank=False)
-    #return self.gravatar(size=60)
-
 class Task(models.Model):
 
     """Model used for creating tasks, with attached parameters."""
     # Links the task model to the list
-    list = models.ForeignKey(List, on_delete=models.CASCADE)
+    list = models.ForeignKey(TaskList, on_delete=models.CASCADE)
     #Defines the name
     task_name = models.CharField(max_length=50, blank=False)
-    # Defines the status
-    status = models.CharField(max_length=50, blank=False)
     # Defines the description
     task_description = models.TextField(max_length=1000)
     #Defines the due Date

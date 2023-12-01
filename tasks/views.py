@@ -5,23 +5,23 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
-from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm
+from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm
 from tasks.helpers import login_prohibited
 from .forms import EditTaskNameForm, EditTaskDescriptionForm
-from .models import Board, TaskList, User, Teams
-
 
 @login_required
 def dashboard(request):
     """Display the current user's dashboard."""
-
     current_user = request.user
-    return render(request, 'dashboard.html', {'user': current_user})
+    current_boards = Board.objects.all()
+    for i in current_boards:
+        print(i)
+    return render(request, 'dashboard.html', {'user': current_user, 'boards' : current_boards})
 
 @login_required
 def create_board_view(request):
@@ -57,11 +57,64 @@ def create_board_view(request):
     else:
         return render(request, 'create_board.html', {'form':form})
 
+
+"""Display the Task Creation screen"""
+def createTaskView(request, taskListID, board_name):
+    print(taskListID)
+    taskList = TaskList.objects.get(pk = taskListID)
+    form = CreateTaskForm()
+
+    print(request.method)
+    # TEMP COMMENT
+    # TEMP COMMENT 2
+    if request.method == 'POST':
+        current_user = request.user
+        form = CreateTaskForm(request.POST)
+        # print("Have entered this if statement")
+        if form.is_valid():
+            #print("Task created")
+            task_name = form.cleaned_data.get('task_name')
+            task_description = form.cleaned_data.get('task_description')
+            due_date = form.cleaned_data.get('due_date')
+            lists = TaskList.objects.all().filter(board=board_name)
+            task = Task.objects.create(list = taskList, task_name = task_name, task_description = task_description, due_date = due_date)
+            #print(task.task_name, task.task_description)
+            tasksList = []
+            for list in lists:
+                tasks = Task.objects.all().filter(list=list)
+                for task in tasks:
+                    print(task)
+                    tasksList.append(task)
+            """Debugging print statements
+            for task in tasks:
+                print(task.task_name)
+            for list in lists:
+                print(list)
+            """
+            return render(request, 'board.html',{'user': current_user,'lists': lists, 'tasks': tasksList})
+        else:
+            return render(request, 'createTask.html', {'form': form})
+    else:
+        return render(request, 'createTask.html', {'form':form})
+
+
 @login_prohibited
 def home(request):
     """Display the application's start/home screen."""
-
     return render(request, 'home.html')
+
+def board(request, board_name):
+    """Display specific board"""
+    current_user = request.user
+    lists = TaskList.objects.all().filter(board = board_name)
+    tasksList = []
+    for list in lists:
+        tasks = Task.objects.all().filter(list = list)
+        for task in tasks:
+            print(task)
+            tasksList.append(task)
+
+    return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -188,6 +241,7 @@ class SignUpView(LoginProhibitedMixin, FormView):
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
+"""
 def change_task_name(request):
     if request.method == 'POST':
         form = EditTaskNameForm(request.POST)
@@ -197,8 +251,7 @@ def change_task_name(request):
             new_name = form.cleaned_data['new_name']
 
             # Perform the task update logic 
-            Task.objects.filter(id=task_id).update(task_name=new_name)
-
+            Task.objects.filter(id=task_id).update(task_name=new_name
             
     else:
         form = EditTaskNameForm()
@@ -221,4 +274,5 @@ def change_task_description(request):
         form = EditTaskDescriptionForm()
 
     return render(request, 'change_task_description.html', {'form': form})  
+"""
 

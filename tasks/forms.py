@@ -2,8 +2,9 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.core.validators import RegexValidator
-from .models import User, Board, Teams
-
+from .models import User, Board, Teams, Task
+from django.contrib.admin.widgets import AdminDateWidget
+from django.forms.fields import DateField
 
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
@@ -88,6 +89,7 @@ class PasswordForm(NewPasswordMixin):
         return self.user
 
 
+
 class SignUpForm(NewPasswordMixin, forms.ModelForm):
     """Form enabling unregistered users to sign up."""
 
@@ -108,31 +110,29 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
             password=self.cleaned_data.get('new_password'),
         )
         return user
-
+    
+"""
 class EditTaskNameForm(forms.ModelForm):
-
     task_id = forms.IntegerField()
-    new_name = forms.CharField(max_length=50)
-
-class EditTaskDescriptionForm(forms.ModelForm):
-
-    task_id = forms.IntegerField()
-    new_description = forms.CharField(max_length=50)
+    new_name = forms.CharField(max_length=50, blank=False, required=True)
+"""
 
 class CreateBoardForm(forms.ModelForm):
     """Form enabling user to create a board"""
-    
+
     class Meta:
         """Board Form Options"""
 
         model = Board
         fields = ['board_name', 'board_type', 'team_emails']
 
+    """Converts user inputted emails into comma seperated list """
     def emails_to_python(self):
         user_emails = self.cleaned_data.get('team_emails')
         user_emails = user_emails.split(",")
         return user_emails
     
+    """Checks all comma-seperated email values in User model and checks if they exist or not."""
     def emails_exist_in_database(self):
         user_emails = self.emails_to_python()
         doesntExist = False
@@ -144,8 +144,7 @@ class CreateBoardForm(forms.ModelForm):
             except User.DoesNotExist:
                 doesntExist = True
         return doesntExist
-
-
+      
     def clean(self):
         """Clean the data inputted by the user and generate a response if there are any errors."""
 
@@ -163,10 +162,8 @@ class CreateBoardForm(forms.ModelForm):
         
         team_members = self.cleaned_data.get('team_emails')
         team_members_result = self.checkEmails(team_members,board_type)
-        allEmailsExist = self.emails_exist_in_database()
-        ems = self.emails_to_python()
         if (team_members_result):
-            self.add_error('team_emails',ems[0] + str(allEmailsExist))
+            self.add_error('team_emails','Inputted emails is not valid')
 
     def checkBoard(self,board_name_to_analyse):
         if (board_name_to_analyse is None):
@@ -202,3 +199,36 @@ class CreateBoardForm(forms.ModelForm):
             board_type=self.cleaned_data.get('board_type'),
             team_emails=self.cleaned_data.get('team_emails'),
         )
+
+
+"""Form to create Task"""
+class CreateTaskForm(forms.ModelForm):
+    class Meta:
+
+        model = Task
+        fields = ["task_name", "task_description", "due_date"]
+
+    due_date = forms.DateField(widget = forms.SelectDateWidget())
+
+    def clean(self):
+        cleaned_data = super().clean()
+        task_name = cleaned_data.get("task_name")
+        if not task_name:
+            self.add_error("task_name", "Task name cannot be blank")
+        elif len(task_name) > 50:
+            self.add_error("task_name", "Task name length cannot exceed 50")
+
+        due_date = cleaned_data.get("due_date")
+        if not due_date:
+            self.add_error("due_date", "Please enter a valid due date")
+
+    def save(self):
+        """Creates Task"""
+        super().save(commit=False)
+        task = Task.objects.create_task(
+            task_name = self.cleaned_data.get('task_name'),
+            task_description = self.cleaned_data.get('task_description'),
+            due_date = self.cleaned_data.get('due_date')
+        )
+        task.save()
+        return task
