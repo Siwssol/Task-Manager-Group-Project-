@@ -113,7 +113,7 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
 
 class EditTaskNameForm(forms.ModelForm):
     task_id = forms.IntegerField()
-    new_name = forms.CharField(max_length=50, blank=False, required=True)
+    new_name = forms.CharField(max_length=50, required=True)
 
 class EditTaskDescriptionForm(forms.ModelForm):
     """Form enabling users to change the task description."""

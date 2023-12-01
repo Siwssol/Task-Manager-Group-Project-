@@ -244,7 +244,8 @@ class SignUpView(LoginProhibitedMixin, FormView):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 
-def change_task_name(request):
+def change_task_name(request, taskID):
+    form = EditTaskNameForm()
     if request.method == 'POST':
         form = EditTaskNameForm(request.POST)
         if form.is_valid():
@@ -254,11 +255,13 @@ def change_task_name(request):
 
             # Perform the task update logic 
             Task.objects.filter(id=task_id).update(task_name=new_name)
-            
-    else:
-        form = EditTaskNameForm()
+        else:
+            return render(request, 'change_task_name.html', {'form': form})
 
-    return render(request, 'change_task_name.html', {'form': form})    
+    else:
+        return render(request, 'change_task_name.html', {'form': form})
+
+
 
 def change_task_description(request):
     if request.method == 'POST':
