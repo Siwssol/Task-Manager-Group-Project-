@@ -52,8 +52,11 @@
                                 <div id="taskDescription{{ task.id }}" class="collapse">
                                     <div class="panel-body">
                                         <p>{{ task.task_description }}</p>
-                                        <a class="EditTaskNameLink" href="{% url 'change_task_name' taskID=task.id %}">
+                                        <a class="EditTaskNameLink" href="{% url 'change_task_name' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
                                             <button type="button" class="EditTaskNameButton">Change task Name</button>
+                                        </a>
+                                        <a class="EditTaskDescLink" href="{% url 'change_task_description' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                            <button type="button" class="EditTaskDescButton">Change task Description</button>
                                         </a>
                                     </div>
                                 </div>
