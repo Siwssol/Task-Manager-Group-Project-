@@ -17,7 +17,7 @@ class AutoSignOutTests(TestCase):
         self.client.login(username='testuser', password='12345')
 
         # Simulate user activity- HAVE TO INCLUDE SPECIFIC PAGE LATER ON
-        self.client.get('/some_page/')
+        self.client.get('/dashboard/')
 
         # Simulate inactivity
         session = self.client.session
