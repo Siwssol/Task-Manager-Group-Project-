@@ -156,6 +156,6 @@ MESSAGE_TAGS = {
 
 #Django session timeout
 
-AUTO_LOGOUT = {'IDLE_TIME': 600, 'REDIRECT_TO_LOGIN_IMMEDIATELY': True, 
+AUTO_LOGOUT = {'IDLE_TIME': 300, 'REDIRECT_TO_LOGIN_IMMEDIATELY': True, 
                'MESSAGE': 'The session has expired. Please login again to continue.',}
 
