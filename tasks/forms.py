@@ -2,9 +2,9 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.core.validators import RegexValidator
+from .models import User, Board, Teams, Task
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateField
-from .models import User, Board, Task
 
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
@@ -111,12 +111,17 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         )
         return user
 
-    
-"""
 class EditTaskNameForm(forms.ModelForm):
     task_id = forms.IntegerField()
-    new_name = forms.CharField(max_length=50, blank=False, required=True)
-"""
+    new_name = forms.CharField(max_length=50, required=True)
+
+class EditTaskDescriptionForm(forms.ModelForm):
+    """Form enabling users to change the task description."""
+
+    #these IDs are compared against the primary key
+    task_id = forms.IntegerField()
+    new_description = forms.CharField(max_length=50)
+
 
 class CreateBoardForm(forms.ModelForm):
     """Form enabling user to create a board"""
@@ -127,6 +132,25 @@ class CreateBoardForm(forms.ModelForm):
         model = Board
         fields = ['board_name', 'board_type', 'team_emails']
 
+    """Converts user inputted emails into comma seperated list """
+    def emails_to_python(self):
+        user_emails = self.cleaned_data.get('team_emails')
+        user_emails = user_emails.split(",")
+        return user_emails
+    
+    """Checks all comma-seperated email values in User model and checks if they exist or not."""
+    def emails_exist_in_database(self):
+        user_emails = self.emails_to_python()
+        doesntExist = False
+        for usr in user_emails:
+            if (doesntExist):
+                break
+            try:
+                User.objects.get(email = usr) 
+            except User.DoesNotExist:
+                doesntExist = True
+        return doesntExist
+      
     def clean(self):
         """Clean the data inputted by the user and generate a response if there are any errors."""
 
@@ -162,11 +186,13 @@ class CreateBoardForm(forms.ModelForm):
     def checkEmails(self,team_emails_to_analyse,board_type_to_analyse):
         if (board_type_to_analyse == 'Private'):
             return False
-        elif (team_emails_to_analyse is None):
-            return True
         else:
-            if (team_emails_to_analyse == "Enter team emails here if necessary, seperated by commas." and (board_type_to_analyse == 'INVALID' or board_type_to_analyse == 'Team')):
+            if (team_emails_to_analyse is None):
                 return True
+            elif (team_emails_to_analyse == "Enter team emails here if necessary, seperated by commas." and (board_type_to_analyse == 'INVALID' or board_type_to_analyse == 'Team')):
+                return True
+            else:
+                return self.emails_exist_in_database()
         return False
 
 
