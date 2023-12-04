@@ -67,8 +67,6 @@ def createTaskView(request, taskListID, board_name):
     form = CreateTaskForm()
 
     print(request.method)
-    # TEMP COMMENT
-    # TEMP COMMENT 2
     if request.method == 'POST':
         current_user = request.user
         form = CreateTaskForm(request.POST)
@@ -98,6 +96,58 @@ def createTaskView(request, taskListID, board_name):
             return render(request, 'createTask.html', {'form': form})
     else:
         return render(request, 'createTask.html', {'form':form})
+
+
+def change_task_name(request, taskID, board_name):
+    task = get_object_or_404(Task, id=taskID)
+    if request.method == 'POST':
+        current_user = request.user
+        form = EditTaskNameForm(request.POST, instance=task, initial={'board_name': board_name})
+        if form.is_valid():
+            # Process the form data
+            new_name = form.cleaned_data['new_name']
+            # Perform the task update logic
+            Task.objects.filter(id=taskID).update(task_name=new_name)
+            lists = TaskList.objects.all().filter(board=board_name)
+            tasksList = []
+            for list in lists:
+                tasks = Task.objects.all().filter(list=list)
+                for task in tasks:
+                    print(task)
+                    tasksList.append(task)
+            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList})
+        else:
+            return render(request, 'change_task_name.html', {'form': form})
+
+    else:
+        form = EditTaskNameForm(instance=task, initial={'board_name': board_name})
+    return render(request, 'change_task_name.html', {'form': form})
+
+
+def change_task_description(request, taskID, board_name):
+    task = get_object_or_404(Task, id=taskID)
+    if request.method == 'POST':
+        current_user = request.user
+        form = EditTaskDescriptionForm(request.POST, instance=task, initial={'board_name': board_name})
+        if form.is_valid():
+            # Process the form data
+            new_description = form.cleaned_data['new_description']
+            # Perform the task update logic
+            Task.objects.filter(id=taskID).update(task_description=new_description)
+            lists = TaskList.objects.all().filter(board=board_name)
+            tasksList = []
+            for list in lists:
+                tasks = Task.objects.all().filter(list=list)
+                for task in tasks:
+                    print(task)
+                    tasksList.append(task)
+            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList})
+        else:
+            return render(request, 'change_task_description.html', {'form': form})
+
+    else:
+        form = EditTaskDescriptionForm(instance=task, initial={'board_name': board_name})
+    return render(request, 'change_task_description.html', {'form': form})
 
 
 @login_prohibited
@@ -243,41 +293,5 @@ class SignUpView(LoginProhibitedMixin, FormView):
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
-
-def change_task_name(request, taskID):
-    form = EditTaskNameForm()
-    if request.method == 'POST':
-        form = EditTaskNameForm(request.POST)
-        if form.is_valid():
-            # Process the form data 
-            task_id = form.cleaned_data['task_id']
-            new_name = form.cleaned_data['new_name']
-
-            # Perform the task update logic 
-            Task.objects.filter(id=task_id).update(task_name=new_name)
-        else:
-            return render(request, 'change_task_name.html', {'form': form})
-
-    else:
-        return render(request, 'change_task_name.html', {'form': form})
-
-
-
-def change_task_description(request):
-    if request.method == 'POST':
-        form = EditTaskDescriptionForm(request.POST)
-        if form.is_valid():
-            # Process the form data 
-            task_id = form.cleaned_data['task_id']
-            new_description = form.cleaned_data['new_description']
-
-            # Perform the task update logic 
-            Task.objects.filter(id=task_id).update(task_name=new_description)
-
-            
-    else:
-        form = EditTaskDescriptionForm()
-
-    return render(request, 'change_task_description.html', {'form': form})  
 
 
