@@ -67,6 +67,8 @@ def createTaskView(request, taskListID, board_name):
     form = CreateTaskForm()
 
     print(request.method)
+    # TEMP COMMENT
+    # TEMP COMMENT 2
     if request.method == 'POST':
         current_user = request.user
         form = CreateTaskForm(request.POST)
@@ -292,6 +294,90 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+"""
+def change_task_name(request):
+    if request.method == 'POST':
+        form = EditTaskNameForm(request.POST)
+        if form.is_valid():
+            # Process the form data 
+            task_id = form.cleaned_data['task_id']
+            new_name = form.cleaned_data['new_name']
+
+            # Perform the task update logic 
+            Task.objects.filter(id=task_id).update(task_name=new_name)
+            
+    else:
+        form = EditTaskNameForm()
+
+    return render(request, 'change_task_name.html', {'form': form})    
+
+
+def change_task_description(request):
+    if request.method == 'POST':
+        form = EditTaskDescriptionForm(request.POST)
+        if form.is_valid():
+            # Process the form data 
+            task_id = form.cleaned_data['task_id']
+            new_description = form.cleaned_data['new_description']
+
+            # Perform the task update logic 
+            Task.objects.filter(id=task_id).update(task_name=new_description)
+
+            
+    else:
+        form = EditTaskDescriptionForm()
+
+    return render(request, 'change_task_description.html', {'form': form})  
+"""
+
+def change_task_name(request):
+
+    """Handles change in task name."""
+
+    if request.method == 'POST':
+        form = EditTaskNameForm(request.POST)
+        if form.is_valid():
+            # Process the form data 
+            task_id = form.cleaned_data['task_id']
+            new_name = form.cleaned_data['new_name']
+    
+
+            # Perform the task update logic :
+            #Filters through the attributes of the task and updates the name
+            Task.objects.filter(pk=task_id).update(task_name=new_name)
+
+            
+    else:
+        form = EditTaskNameForm()
+
+    #renders template, passes form object returns HTTP response
+    return render(request, 'change_task_name.html', {'form': form})    
+
+def change_task_description(request):
+
+    """Handles change in task description."""
+
+    if request.method == 'POST':
+        form = EditTaskDescriptionForm(request.POST)
+        if form.is_valid():
+            # Process the form data 
+            task_id = form.cleaned_data['task_id']
+            new_description = form.cleaned_data['new_description']
+
+            # Perform the task update logic
+            # #Filters through the attributes of the task and updates the description 
+            Task.objects.filter(pk=task_id).update(task_description=new_description)
+
+            
+    else:
+        form = EditTaskDescriptionForm()
+
+    #renders template, passes form object returns HTTP response
+
+    return render(request, 'change_task_description.html', {'form': form})  
+
+
 
 
 
