@@ -2,8 +2,9 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.core.validators import RegexValidator
-
-from .models import User, Board
+from .models import User, Board, Teams, Task
+from django.contrib.admin.widgets import AdminDateWidget
+from django.forms.fields import DateField
 
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
@@ -88,6 +89,7 @@ class PasswordForm(NewPasswordMixin):
         return self.user
 
 
+
 class SignUpForm(NewPasswordMixin, forms.ModelForm):
     """Form enabling unregistered users to sign up."""
 
@@ -109,18 +111,56 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         )
         return user
 
-    
-
 class EditTaskNameForm(forms.ModelForm):
 
-    task_id = forms.IntegerField()
-    new_name = forms.CharField(max_length=50, blank=False)
+    class Meta:
+        model = Task
+        fields=['new_name']
 
+    new_name = forms.CharField(max_length=50, required=True)
+
+    def clean(self):
+       cleaned_data = super().clean()
+       new_task_name = cleaned_data.get("new_name")
+       if not new_task_name:
+           self.add_error("new_name", "Task name cannot be blank")
+       elif len(new_task_name) > 50:
+           self.add_error("new_name", "Task name length cannot exceed 50")
+
+    def save(self, commit = True):
+        instance = super().save(commit=False)
+        new_task_name = self.cleaned_data['new_name']
+        instance.task_name = new_task_name
+        if commit:
+            instance.save()
+        return instance
+
+
+class EditTaskDescriptionForm(forms.ModelForm):
+    """Form enabling users to change the task description."""
+    class Meta:
+        model = Task
+        fields=['new_description']
+
+    new_description = forms.CharField(max_length=50)
+
+    def clean(self):
+       cleaned_data = super().clean()
+       new_task_description = cleaned_data.get("new_name")
+       if new_task_description is not None and len(new_task_description) > 1000:
+           self.add_error("new_description", "Task name length cannot exceed 1000")
+
+    def save(self, commit = True):
+        instance = super().save(commit=False)
+        new_task_name = self.cleaned_data['new_description']
+        instance.task_name = new_task_name
+        if commit:
+            instance.save()
+        return instance
 
 
 class CreateBoardForm(forms.ModelForm):
     """Form enabling user to create a board"""
-    
 
     class Meta:
         """Board Form Options"""
@@ -128,23 +168,69 @@ class CreateBoardForm(forms.ModelForm):
         model = Board
         fields = ['board_name', 'board_type', 'team_emails']
 
+    """Converts user inputted emails into comma seperated list """
+    def emails_to_python(self):
+        user_emails = self.cleaned_data.get('team_emails')
+        user_emails = user_emails.split(",")
+        return user_emails
+    
+    """Checks all comma-seperated email values in User model and checks if they exist or not."""
+    def emails_exist_in_database(self):
+        user_emails = self.emails_to_python()
+        doesntExist = False
+        for usr in user_emails:
+            if (doesntExist):
+                break
+            try:
+                User.objects.get(email = usr) 
+            except User.DoesNotExist:
+                doesntExist = True
+        return doesntExist
+      
     def clean(self):
         """Clean the data inputted by the user and generate a response if there are any errors."""
 
         super().clean()
+
+        board_name = self.cleaned_data.get('board_name')
+        board_name_result = self.checkBoard(board_name)
+        if(board_name_result):
+            self.add_error('board_name','Board name is empty.')
+            
         board_type = self.cleaned_data.get('board_type')
-
-        if board_type == 'INVALID':
-
-            self.add_error('board_type', 'Board Type is not valid. Please choose another type.')
-
+        board_type_result = self.checkBoardType(board_type)
+        if (board_type_result):
+            self.add_error('board_type','Select a valid option.')
+        
         team_members = self.cleaned_data.get('team_emails')
+        team_members_result = self.checkEmails(team_members,board_type)
+        if (team_members_result):
+            self.add_error('team_emails','Inputted emails is not valid')
 
-        if (team_members == "Enter team emails here if necessary, seperated by commas." and board_type == "Team"):
-            self.add_error('team_emails', 'Team emails is not valid.')
+    def checkBoard(self,board_name_to_analyse):
+        if (board_name_to_analyse is None):
+            return True
+        else:      
+            return False
+    
+    def checkBoardType(self,board_type_to_analyse):
+        if (board_type_to_analyse == "INVALID"):
+            return True
+        else:
+            return False
 
-        elif (team_members == "Enter team emails here if necessary, seperated by commas." and board_type == "INVALID"):
-            self.add_error('team_emails', 'Team emails is not valid.')
+    def checkEmails(self,team_emails_to_analyse,board_type_to_analyse):
+        if (board_type_to_analyse == 'Private'):
+            return False
+        else:
+            if (team_emails_to_analyse is None):
+                return True
+            elif (team_emails_to_analyse == "Enter team emails here if necessary, seperated by commas." and (board_type_to_analyse == 'INVALID' or board_type_to_analyse == 'Team')):
+                return True
+            else:
+                return self.emails_exist_in_database()
+        return False
+
 
     def save(self):
         """ Create new board"""
@@ -156,4 +242,35 @@ class CreateBoardForm(forms.ModelForm):
             team_emails=self.cleaned_data.get('team_emails'),
         )
 
-            
+
+"""Form to create Task"""
+class CreateTaskForm(forms.ModelForm):
+    class Meta:
+
+        model = Task
+        fields = ["task_name", "task_description", "due_date"]
+
+    due_date = forms.DateField(widget = forms.SelectDateWidget())
+
+    def clean(self):
+        cleaned_data = super().clean()
+        task_name = cleaned_data.get("task_name")
+        if not task_name:
+            self.add_error("task_name", "Task name cannot be blank")
+        elif len(task_name) > 50:
+            self.add_error("task_name", "Task name length cannot exceed 50")
+
+        due_date = cleaned_data.get("due_date")
+        if not due_date:
+            self.add_error("due_date", "Please enter a valid due date")
+
+    def save(self):
+        """Creates Task"""
+        super().save(commit=False)
+        task = Task.objects.create_task(
+            task_name = self.cleaned_data.get('task_name'),
+            task_description = self.cleaned_data.get('task_description'),
+            due_date = self.cleaned_data.get('due_date')
+        )
+        task.save()
+        return task

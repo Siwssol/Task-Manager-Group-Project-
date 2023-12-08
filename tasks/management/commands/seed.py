@@ -69,4 +69,4 @@ def create_username(first_name, last_name):
     return '@' + first_name.lower() + last_name.lower()
 
 def create_email(first_name, last_name):
-    return first_name + '.' + last_name + '@example.org'
+    return first_name.lower() + '.' + last_name.lower() + '@example.org'

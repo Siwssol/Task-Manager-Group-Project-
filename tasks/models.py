@@ -20,6 +20,7 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
+    
     class Meta:
         """Model options."""
 
@@ -46,18 +47,25 @@ class User(AbstractUser):
 
 class Teams(models.Model):
     """initialises the teams and shows what type of permissions there are """
-    permissions = ['owner', 'admin', 'member', 'guest']
-    def __init__(self):
-        self.teammembers = []
-        self.teampermissions = []
+    class Permissions(models.IntegerChoices):
+        OWNER = 1
+        ADMIN = 2
+        MEMBER = 3
+        GUEST = 4
+    
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    members = models.ManyToManyField(User, related_name='team_member')
+    permission_level = models.IntegerField(choices=Permissions.choices, default = 4)
         
     """function for adding a user to the team"""
     def add_user(self, user):
-        self.teammembers.append(user)
-        if 'owner' not in self.teampermissions:
-            self.teampermissions.append('owner')
-        else:
-            self.teampermissions.append('guest')
+        self.members.add(user)
+        # self.teammembers.append(user)
+        # if 'owner' not in self.teampermissions:
+        #     self.teampermissions.append('owner')
+        # else:
+        #     self.teampermissions.append('guest')
+
     """function for inviting users after team has been initialised"""
     def invite_user(self, user, str):
         self.teammembers.append(user)
@@ -93,26 +101,30 @@ class Teams(models.Model):
         pos = self.teammembers(user)
         return self.teampermissions[pos]
 
-    class Meta:
-        managed = False
-       
-    
+        
 class Board(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
     BOARD_CHOICES = (('INVALID','Choose Type'),
-                    ('Private','Private'),
-                    ('Team','Team'),
-                    )
+                ('Private','Private'),
+                ('Team','Team'),
+                )
+    
+    author = models.ForeignKey(User, on_delete=models.CASCADE, 
+                               related_name='auth')
         
     board_name = models.CharField(primary_key=True,
                                 max_length=30,
                                 unique=True,
+                                blank = False
                                 )
     
-    board_type = models.CharField(max_length=11,choices=BOARD_CHOICES,default='INVALID')
-    team_emails = models.TextField(default="Enter team emails here if necessary, seperated by commas.")
-
-    team = models.ForeignKey(Teams, on_delete=models.CASCADE)
+    board_type = models.CharField(max_length=11,
+                                  choices=BOARD_CHOICES,
+                                  default='INVALID',
+                                  )
+    
+    team_emails = models.TextField(default="Enter team emails here if necessary, seperated by commas.",
+                                  )
+    team = models.OneToOneField(Teams,on_delete = models.CASCADE)
     
     def initialiseteam(self):
         team_users = self.team_emails.split(',')
@@ -137,12 +149,11 @@ class Task(models.Model):
 
     """Model used for creating tasks, with attached parameters."""
     # Links the task model to the list
-    list = models.ForeignKey(TaskList, on_delete=models.CASCADE, default="To do")
+    list = models.ForeignKey(TaskList, on_delete=models.CASCADE)
     #Defines the name
     task_name = models.CharField(max_length=50, blank=False)
-    # Defines the status
-    status = models.CharField(max_length=50, blank=False)
     # Defines the description
     task_description = models.TextField(max_length=1000)
     #Defines the due Date
     due_date = models.DateTimeField()
+

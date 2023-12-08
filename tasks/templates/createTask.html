@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+{% extends 'base_content.html' %}
+{% block content %}
+<html lang="en">
+<body>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12 col-md-6 offset-md-3">
+        <h1>CREATE A NEW TASK NOW!!! </h1>
+        <form action="{% url 'createTask' taskListID=request.resolver_match.kwargs.taskListID board_name=request.resolver_match.kwargs.board_name %}" method="post">
+            <input type="hidden" name="next" value="{{ next }}">
+            {% csrf_token %}
+            {% include 'partials/bootstrap_form.html' with form=form %}
+            <button type="submit" class="boards" >Add task</button>
+        </form>
+    </div>
+
+  </div>
+</div>
+</body>
+{% endblock %}
+</html>

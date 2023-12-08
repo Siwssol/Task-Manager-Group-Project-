@@ -18,7 +18,6 @@
         overflow-x: auto;
         flex-flow: nowrap;
         white-space: nowrap;
-        display: inline-block;
     }
 
     .boardLink {
@@ -72,25 +71,21 @@
             </div>
         </div>
     </div>
-  </div>
-</div>
 
-<!-- Django Auto Logout-->
-{{ redirect_to_login_immediately }}
-
-{% endblock %}
-
-
-    <div class="container " class="boardsContainer">
-        <div class="row " class="boardsRow">
+    <div class="container boardsContainer">
+        <div class="row boardsRow">
             {% for board in boards %}
-            <div class="col-4" class="boardCont">
-                <a class ="boardLink" href= "{% url 'board' board.board_name %}"><button type="button" class="boards"  >{{ board.board_name }}</button></a>
+            <div class="col-4 boardCont">
+                <a class ="boardLink" href= "{% url 'board' board.board_name %}">
+                    <button type="button" class="boards" >{{ board.board_name }}</button>
+                </a>
             </div>
             {% endfor %}
 
         </div>
     </div>
 
+<!-- Django Auto Logout-->
+{{ redirect_to_login_immediately }}
 
 {% endblock %}
