@@ -5,7 +5,29 @@
         <!-- Can choose a different layout-->
           {% if 'boards' in request.path %}
               <!--Need to add members page to view members...-->
-              <a class="nav-link" >View members</a>
+              <!-- View members button-->
+              <!--<a class="nav-link" >View members</a> -->
+              <!-- New Dropdown Button -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="viewMembersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    View Members
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="viewMembersDropdown">
+                    <!-- Static member entries with checkboxes for demonstration -->
+                    <li class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="memberCheckbox1">
+                        <label class="form-check-label" for="memberCheckbox1">
+                            Member 1
+                        </label>
+                    </li>
+                    <li class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="memberCheckbox2">
+                        <label class="form-check-label" for="memberCheckbox2">
+                            Member 2
+                        </label>
+                    </li>
+                </ul>
+            </li>
           {% else %}
               <a class="nav-link" href="{% url 'create_board_view' %}">Create Board</a>
           {% endif %}
@@ -24,3 +46,4 @@
   </li>
   </ul>
 </div>
+

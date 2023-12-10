@@ -136,6 +136,23 @@ class Board(models.Model):
     def invite(self , name, perm):
         self.team.invite_user(name, perm)
 
+        
+    # To fully implement:
+    # Allow board owner to -
+    # Remove specific users from the board
+    
+    def remove_member(self, requesting_user, user_to_remove):
+        # Check if the requesting user is the board owner
+        if self.author != requesting_user:
+            raise PermissionError("Only the board owner can remove members.")
+
+        # Check if the user to be removed is in the team associated with the board
+        if self.team.members.filter(id=user_to_remove.id).exists():
+            self.team.members.remove(user_to_remove)
+        else:
+            raise ValueError("User is not a member of the board")
+
+
     def removeuser(self , user):
         self.remove_user(user)
 
