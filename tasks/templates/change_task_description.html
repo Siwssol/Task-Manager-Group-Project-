@@ -5,9 +5,10 @@
 </head>
 <body>
     <h2>Change Task Description</h2>
-    <form method="post" action="{% url 'change_task_description' %}">
+    <form method="post" action="{% url 'change_task_description'  taskID=request.resolver_match.kwargs.taskID board_name=request.resolver_match.kwargs.board_name %}">
         {% csrf_token %}
-        {{ form.as_p }}
+        <label for="description">Enter description</label><br>
+        <textarea name="description" maxlength="120">{{ new_description }}</textarea><br>
         <button type="submit">Change Task Description</button>
     </form>
 </body>

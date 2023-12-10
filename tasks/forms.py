@@ -110,12 +110,54 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
             password=self.cleaned_data.get('new_password'),
         )
         return user
-    
-"""
+
 class EditTaskNameForm(forms.ModelForm):
-    task_id = forms.IntegerField()
-    new_name = forms.CharField(max_length=50, blank=False, required=True)
-"""
+
+    class Meta:
+        model = Task
+        fields=['new_name']
+
+    new_name = forms.CharField(max_length=50, required=True)
+
+    def clean(self):
+       cleaned_data = super().clean()
+       new_task_name = cleaned_data.get("new_name")
+       if not new_task_name:
+           self.add_error("new_name", "Task name cannot be blank")
+       elif len(new_task_name) > 50:
+           self.add_error("new_name", "Task name length cannot exceed 50")
+
+    def save(self, commit = True):
+        instance = super().save(commit=False)
+        new_task_name = self.cleaned_data['new_name']
+        instance.task_name = new_task_name
+        if commit:
+            instance.save()
+        return instance
+
+
+class EditTaskDescriptionForm(forms.ModelForm):
+    """Form enabling users to change the task description."""
+    class Meta:
+        model = Task
+        fields=['new_description']
+
+    new_description = forms.CharField(max_length=50)
+
+    def clean(self):
+       cleaned_data = super().clean()
+       new_task_description = cleaned_data.get("new_name")
+       if new_task_description is not None and len(new_task_description) > 1000:
+           self.add_error("new_description", "Task name length cannot exceed 1000")
+
+    def save(self, commit = True):
+        instance = super().save(commit=False)
+        new_task_name = self.cleaned_data['new_description']
+        instance.task_name = new_task_name
+        if commit:
+            instance.save()
+        return instance
+
 
 class CreateBoardForm(forms.ModelForm):
     """Form enabling user to create a board"""

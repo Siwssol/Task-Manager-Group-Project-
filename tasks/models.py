@@ -44,15 +44,9 @@ class User(AbstractUser):
 
         return self.gravatar(size=60)
 
-<<<<<<< Updated upstream
-      
-class Teams(models.Model):
-    """initialises the teams and shows what type of permissions there are """
-=======
 
 """ Model in charge of storing user and their respective permission level within the board (restricts interaction ability)"""
 class TeamMembershipStatus(models.Model):
->>>>>>> Stashed changes
     class Permissions(models.IntegerChoices):
         OWNER = 1
         MEMBER = 2
@@ -116,9 +110,6 @@ class Teams(models.Model):
         pos = self.teammembers(user)
         return self.teampermissions[pos]
 
-    class Meta:
-        managed = False
-
         
 class Board(models.Model):
     BOARD_CHOICES = (('INVALID','Choose Type'),
@@ -155,7 +146,24 @@ class Board(models.Model):
     def invite(self , name, perm):
         self.team.invite_user(name, perm)
 
-    def removemember(self,user):
+        
+    # To fully implement:
+    # Allow board owner to -
+    # Remove specific users from the board
+    
+    def remove_member(self, requesting_user, user_to_remove):
+        # Check if the requesting user is the board owner
+        if self.author != requesting_user:
+            raise PermissionError("Only the board owner can remove members.")
+
+        # Check if the user to be removed is in the team associated with the board
+        if self.team.members.filter(id=user_to_remove.id).exists():
+            self.team.members.remove(user_to_remove)
+        else:
+            raise ValueError("User is not a member of the board")
+
+
+    def removeuser(self , user):
         self.remove_user(user)
 
 
