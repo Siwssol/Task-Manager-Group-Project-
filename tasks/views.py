@@ -10,7 +10,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
-from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm
+from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm, AssignTasksForm
 from tasks.helpers import login_prohibited
 from tasks.models import Board, TaskList, User, Teams, Task
 
@@ -87,6 +87,7 @@ def createTaskView(request, taskListID, board_name):
                 for task in tasks:
                     print(task)
                     tasksList.append(task)
+
             """Debugging print statements
             for task in tasks:
                 print(task.task_name)
@@ -376,6 +377,18 @@ def change_task_description(request):
     #renders template, passes form object returns HTTP response
 
     return render(request, 'change_task_description.html', {'form': form})  
+
+
+#def assign_tasks(request):
+    #if request.method == 'POST':
+        #form = AssignTasksForm(request.POST)
+        #if form.is_valid():
+            #selected_team_members = form.cleaned_data['team_members']
+            #return render(request, 'task_assigned.html', {'selected_team_members': selected_team_members})
+    #else:
+        #form = TaskAssignmentForm()
+
+    #return render(request, 'assign_task.html', {'form': form})
 
 
 
