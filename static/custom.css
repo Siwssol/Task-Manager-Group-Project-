@@ -15,15 +15,6 @@
   padding-top: 10px;
 }
 
-.container 
-{
-  /*
-  * home page 
-  * change background colour of main container
-  */
-  background-color:#5A6C5F;
-}
-
 
 .h-100 {
   min-height: 100vh;
