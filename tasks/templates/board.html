@@ -3,6 +3,7 @@
 {% extends 'base_content.html' %}
 {% block content %}
     <style>
+
     .ListRow{
         height: 520px;
         position: relative;
@@ -38,9 +39,10 @@
         display: grid;
         justify-content: center;
         align-items: center;
+        position: relative;
         padding: 5px;
         width: 320px;
-        height: max-content;
+        height: min-content;
         margin: 0;
         inline-size: 300px;
         overflow-wrap: break-word;
@@ -62,6 +64,7 @@
     .Task {
         width: 290px;
         height: max-content;
+        position: relative;
         justify-content: center;
         margin: 0;
         background-color: white;
@@ -78,10 +81,32 @@
         text-decoration: none !important;
     }
 
+    .panel-heading {
+        height: min-content;
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        line-height: normal;
+    }
+
 
     .taskListContainer {
         position: relative;
         z-index: 1;
+    }
+
+    .TaskOptions {
+        z-index: 2;
+        position: absolute;
+        line-height: normal;
+        left: 87%;
+        top: 7px;
+        border-radius: 20px;
+        width: min-content;
+        background-color: white;
+        border-color: white;
+        height: min-content;
+        font-size: 13px;
     }
 
     body {
@@ -261,7 +286,25 @@
                         {% if task.list_id == list.id %}
                             <div class="panel panel-default TaskContainer">
                                 <div class="panel-heading">
-                                    <button class="Task" type="button" data-bs-toggle="collapse" data-bs-target="#taskDetails{{ task.id }}" aria-expanded="false" aria-controls="TaskDescription">{{ task.task_name }}</button>
+                                    <button class="Task Task{{ task.id }}" type="button" data-bs-toggle="collapse" data-bs-target="#taskDetails{{ task.id }}" aria-expanded="false" aria-controls="TaskDescription">{{ task.task_name }}
+                                        <button class="TaskOptions" type="button" data-bs-toggle="dropdown"><i class="bi bi-arrow-left-right"></i></button>
+                                        {% if list.listName == "To Do" %}
+                                            <ul class="dropdown-menu">
+                                                <button>In Progress</button>
+                                                <button>Completed</button>
+                                            </ul>
+                                        {% elif list.listName == "In Progress" %}
+                                            <ul class="dropdown-menu">
+                                                <button>To Do</button>
+                                                <button>Completed</button>
+                                            </ul>
+                                        {% elif list.listName == "Completed" %}
+                                            <ul class="dropdown-menu">
+                                                <button>To Do</button>
+                                                <button>In Progress</button>
+                                            </ul>
+                                        {% endif %}
+                                    </button>
                                 </div>
                                 <div id="taskDetails{{ task.id }}" class="collapse taskDetails" >
                                     <div class="panel-body">
@@ -272,9 +315,7 @@
                                         <a class="EditTaskDescLink" href="{% url 'change_task_description' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
                                             <button type="button" class="EditTaskDescButton">Edit Description</button>
                                         </a>
-                                        <a class="EditTaskDescLink" href="{% url 'change_task_description' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
-                                            <button type="button" class="EditTaskDescButton">Move Task</button>
-                                        </a>
+
                                     </div>
                                 </div>
                             </div>

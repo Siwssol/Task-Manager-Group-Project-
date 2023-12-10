@@ -155,6 +155,12 @@ def home(request):
     """Display the application's start/home screen."""
     return render(request, 'home.html')
 
+"""
+def changeTaskLocation(request, taskID, board_name):
+    task = Task.objects.get(id=taskID)
+    if request.method == 'POST':
+"""
+
 def board(request, board_name):
     """Display specific board"""
     current_user = request.user
