@@ -13,12 +13,23 @@ from django.urls import reverse
 from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm
 from tasks.helpers import login_prohibited
 from .forms import EditTaskNameForm, EditTaskDescriptionForm
+<<<<<<< Updated upstream
+=======
+from .models import Board, TaskList
+from tasks.models import Board, TaskList, User, Teams, Task, TeamMembershipStatus
+
+>>>>>>> Stashed changes
 
 @login_required
 def dashboard(request):
     """Display the current user's dashboard."""
     current_user = request.user
+<<<<<<< Updated upstream
     current_boards = Board.objects.all()
+=======
+    current_boards = Board.objects.all().filter(team__members = current_user)
+    current_boards.distinct()
+>>>>>>> Stashed changes
     for i in current_boards:
         print(i)
     return render(request, 'dashboard.html', {'user': current_user, 'boards' : current_boards})
@@ -37,20 +48,30 @@ def create_board_view(request):
             """ Create Team based on user input"""
             emails = form.emails_to_python()
             if board_type == 'Team':
+<<<<<<< Updated upstream
                 created_team = Teams.objects.create(author = current_user, members = current_user, permission_level = 1)
+=======
+                created_team = Teams.objects.create(author = current_user)
+                TeamMembershipStatus.objects.create(team = created_team, user = current_user, permission_level = TeamMembershipStatus.Permissions.OWNER)
+>>>>>>> Stashed changes
                 for em in emails:
                     usr = User.objects.get(email = em)
-                    created_team.members.add(usr)
+                    TeamMembershipStatus.objects.create(team = created_team, user = usr)
             else:
                 """A private team will have a single member team. This could allow for future ability to implement change from private -> team """
+<<<<<<< Updated upstream
                 single_member_team = Teams.objects.create(author = current_user, members = current_user)
+=======
+                created_team = Teams.objects.create(author = current_user)
+                TeamMembershipStatus.objects.create(team = created_team, user = current_user, permission_level = TeamMembershipStatus.Permissions.OWNER)
+>>>>>>> Stashed changes
             board = Board.objects.create(author=current_user, board_name = board_name,
                                           board_type=board_type, team_emails = board_members,
                                           team = created_team)
             TaskList.objects.create(board = board, listName="To Do")
             TaskList.objects.create(board = board, listName="In Progress")
             TaskList.objects.create(board = board, listName="Completed")
-            boards = Board.objects.all()
+            boards = Board.objects.all().filter(team__members = current_user)
             return render(request,'dashboard.html',{'user':current_user, 'boards': boards})
         else:
             return render(request, 'create_board.html', {'form':form})
@@ -106,15 +127,44 @@ def home(request):
 def board(request, board_name):
     """Display specific board"""
     current_user = request.user
-    lists = TaskList.objects.all().filter(board = board_name)
-    tasksList = []
-    for list in lists:
-        tasks = Task.objects.all().filter(list = list)
-        for task in tasks:
-            print(task)
-            tasksList.append(task)
+    current_board = Board.objects.get(board_name = board_name)
+    current_team = current_board.team
+    if request.method == 'POST':
+        # check if board overlay was interacted with or not
+        # CODE NEEDS TO BE REFACTORED HERE DUE TO DUPLICATION
+        if 'accepted' in request.POST:
+            # Change user membership level and let them access board normally.
+            team_membership_obj = TeamMembershipStatus.objects.get(team = current_team, user = current_user)
+            team_membership_obj.permission_level = TeamMembershipStatus.Permissions.MEMBER
+            team_membership_obj.save()
+            member_status = TeamMembershipStatus.objects.get(team = current_team, user = current_user)
+            lists = TaskList.objects.all().filter(board = board_name)
+            tasksList = []
+            for list in lists:
+                tasks = Task.objects.all().filter(list = list)
+                for task in tasks:
+                    print(task)
+                    tasksList.append(task)
+            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level})
+        elif 'rejected' in request.POST:
+            # remove user's association from the board if they choose to not be a part of it.
+            team_membership_obj = TeamMembershipStatus.objects.get(team = current_team, user = current_user)            
+            current_team.members.remove(current_user)  
+            team_membership_obj.delete()
+            boards = Board.objects.filter(team__members = current_user)
+            return render(request,'dashboard.html',{'user':current_user, 'boards': boards})
+    else:
+        # if user did not send post request (did not press accept or reject), display the board as normal.    
+        member_status = TeamMembershipStatus.objects.get(team = current_team, user = current_user)
+        lists = TaskList.objects.all().filter(board = board_name)
+        tasksList = []
+        for list in lists:
+            tasks = Task.objects.all().filter(list = list)
+            for task in tasks:
+                print(task)
+                tasksList.append(task)
 
-    return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList})
+        return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
