@@ -1,0 +1,77 @@
+<style>
+    .TaskListCont {
+        filter:blur(10px);
+    }
+
+    .taskListContainer {
+        filter: blur(10px);
+    }
+
+        /* overlay css */
+    .overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index:1000;
+    }
+    .overlay-reject button{
+        border-radius: 10px;
+        border-color: red;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        background-color: red;
+        position: absolute;
+        bottom: 5px;
+        left: 85%;
+    }
+
+    .overlay-accept button{
+        border-radius: 10px;
+        border-color:green;
+        background-color: green;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); 
+        position: absolute;
+        bottom: 5px;
+        left: 0%;
+        transform: translateX(2%);
+    }
+
+
+    /* Disable pointer events for elements behind the blur */
+    .taskListContainer,
+    .TaskListCont,
+    .TaskListName,
+    .TaskLists,
+    .Task {
+        pointer-events: none;
+    }
+
+    /* Enable pointer events for the overlay and its buttons */
+    .overlay,
+    .overlay-accept,
+    .overlay-reject,
+    .overlay-accept button,
+    .overlay-reject button {
+        pointer-events: auto;
+    }
+</style>
+<body>
+    <!-- Overlay HTML Code -->
+        <div class="overlay">
+            <p> It appears you haven't attempted to enter this board yet. </p>
+            <p> Please accept or reject the invitation to join this board.</p>
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="overlay-accept">
+                    <button type="submit" name="accepted">Accept</button>
+                </div>
+                <div class="overlay-reject">
+                    <button type="submit" name="rejected">Reject</button>
+                </div>    
+            </form>
+        </div> 
+</body>
