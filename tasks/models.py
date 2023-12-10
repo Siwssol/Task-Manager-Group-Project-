@@ -44,7 +44,7 @@ class User(AbstractUser):
 
         return self.gravatar(size=60)
 
-      
+
 class Teams(models.Model):
     """initialises the teams and shows what type of permissions there are """
     class Permissions(models.IntegerChoices):
@@ -135,6 +135,7 @@ class Board(models.Model):
     
     def invite(self , name, perm):
         self.team.invite_user(name, perm)
+
         
     # To fully implement:
     # Allow board owner to -
@@ -150,6 +151,10 @@ class Board(models.Model):
             self.team.members.remove(user_to_remove)
         else:
             raise ValueError("User is not a member of the board")
+
+
+    def removeuser(self , user):
+        self.remove_user(user)
 
 
 """Each task will be stored in a certain list, so we need to keep track on which list the task is in"""
