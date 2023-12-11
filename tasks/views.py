@@ -10,15 +10,19 @@ from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
-from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm
+from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm, AssignTasksForm
 from tasks.helpers import login_prohibited
-from tasks.models import Board, TaskList, User, Teams, Task
+from .forms import EditTaskNameForm, EditTaskDescriptionForm
+from .models import Board, TaskList
+from tasks.models import Board, TaskList, User, Teams, Task, TeamMembershipStatus
+
 
 @login_required
 def dashboard(request):
     """Display the current user's dashboard."""
     current_user = request.user
-    current_boards = Board.objects.all().filter(author=current_user)
+    current_boards = Board.objects.all().filter(team__members = current_user)
+    current_boards.distinct()
     for i in current_boards:
         print(i)
     return render(request, 'dashboard.html', {'user': current_user, 'boards' : current_boards})
@@ -38,21 +42,21 @@ def create_board_view(request):
             emails = form.emails_to_python()
             if board_type == 'Team':
                 created_team = Teams.objects.create(author = current_user)
-                created_team.members.add(current_user)
+                TeamMembershipStatus.objects.create(team = created_team, user = current_user, permission_level = TeamMembershipStatus.Permissions.OWNER)
                 for em in emails:
                     usr = User.objects.get(email = em)
-                    created_team.members.add(usr)
+                    TeamMembershipStatus.objects.create(team = created_team, user = usr)
             else:
                 """A private team will have a single member team. This could allow for future ability to implement change from private -> team """
                 created_team = Teams.objects.create(author = current_user)
-                created_team.members.add(current_user)
+                TeamMembershipStatus.objects.create(team = created_team, user = current_user, permission_level = TeamMembershipStatus.Permissions.OWNER)
             board = Board.objects.create(author=current_user, board_name = board_name,
                                           board_type=board_type, team_emails = board_members,
                                           team = created_team)
             TaskList.objects.create(board = board, listName="To Do")
             TaskList.objects.create(board = board, listName="In Progress")
             TaskList.objects.create(board = board, listName="Completed")
-            boards = Board.objects.all()
+            boards = Board.objects.all().filter(team__members = current_user)
             return render(request,'dashboard.html',{'user':current_user, 'boards': boards})
         else:
             return render(request, 'create_board.html', {'form':form})
@@ -67,6 +71,8 @@ def createTaskView(request, taskListID, board_name):
     form = CreateTaskForm()
 
     print(request.method)
+    # TEMP COMMENT
+    # TEMP COMMENT 2
     if request.method == 'POST':
         current_user = request.user
         form = CreateTaskForm(request.POST)
@@ -85,6 +91,7 @@ def createTaskView(request, taskListID, board_name):
                 for task in tasks:
                     print(task)
                     tasksList.append(task)
+
             """Debugging print statements
             for task in tasks:
                 print(task.task_name)
@@ -177,15 +184,44 @@ def updateTaskLocation(request, taskID, board_name):
 def board(request, board_name):
     """Display specific board"""
     current_user = request.user
-    lists = TaskList.objects.all().filter(board = board_name)
-    tasksList = []
-    for list in lists:
-        tasks = Task.objects.all().filter(list = list)
-        for task in tasks:
-            print(task)
-            tasksList.append(task)
+    current_board = Board.objects.get(board_name = board_name)
+    current_team = current_board.team
+    if request.method == 'POST':
+        # check if board overlay was interacted with or not
+        # CODE NEEDS TO BE REFACTORED HERE DUE TO DUPLICATION
+        if 'accepted' in request.POST:
+            # Change user membership level and let them access board normally.
+            team_membership_obj = TeamMembershipStatus.objects.get(team = current_team, user = current_user)
+            team_membership_obj.permission_level = TeamMembershipStatus.Permissions.MEMBER
+            team_membership_obj.save()
+            member_status = TeamMembershipStatus.objects.get(team = current_team, user = current_user)
+            lists = TaskList.objects.all().filter(board = board_name)
+            tasksList = []
+            for list in lists:
+                tasks = Task.objects.all().filter(list = list)
+                for task in tasks:
+                    print(task)
+                    tasksList.append(task)
+            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level})
+        elif 'rejected' in request.POST:
+            # remove user's association from the board if they choose to not be a part of it.
+            team_membership_obj = TeamMembershipStatus.objects.get(team = current_team, user = current_user)            
+            current_team.members.remove(current_user)  
+            team_membership_obj.delete()
+            boards = Board.objects.filter(team__members = current_user)
+            return render(request,'dashboard.html',{'user':current_user, 'boards': boards})
+    else:
+        # if user did not send post request (did not press accept or reject), display the board as normal.    
+        member_status = TeamMembershipStatus.objects.get(team = current_team, user = current_user)
+        lists = TaskList.objects.all().filter(board = board_name)
+        tasksList = []
+        for list in lists:
+            tasks = Task.objects.all().filter(list = list)
+            for task in tasks:
+                print(task)
+                tasksList.append(task)
 
-    return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList})
+        return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -297,6 +333,8 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 
+
+
 class SignUpView(LoginProhibitedMixin, FormView):
     """Display the sign up screen and handle sign ups."""
 
@@ -311,6 +349,102 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+"""
+def change_task_name(request):
+    if request.method == 'POST':
+        form = EditTaskNameForm(request.POST)
+        if form.is_valid():
+            # Process the form data 
+            task_id = form.cleaned_data['task_id']
+            new_name = form.cleaned_data['new_name']
+
+            # Perform the task update logic 
+            Task.objects.filter(id=task_id).update(task_name=new_name)
+            
+    else:
+        form = EditTaskNameForm()
+
+    return render(request, 'change_task_name.html', {'form': form})    
+
+
+def change_task_description(request):
+    if request.method == 'POST':
+        form = EditTaskDescriptionForm(request.POST)
+        if form.is_valid():
+            # Process the form data 
+            task_id = form.cleaned_data['task_id']
+            new_description = form.cleaned_data['new_description']
+
+            # Perform the task update logic 
+            Task.objects.filter(id=task_id).update(task_name=new_description)
+
+            
+    else:
+        form = EditTaskDescriptionForm()
+
+    return render(request, 'change_task_description.html', {'form': form})  
+"""
+
+def change_task_name(request):
+
+    """Handles change in task name."""
+
+    if request.method == 'POST':
+        form = EditTaskNameForm(request.POST)
+        if form.is_valid():
+            # Process the form data 
+            task_id = form.cleaned_data['task_id']
+            new_name = form.cleaned_data['new_name']
+    
+
+            # Perform the task update logic :
+            #Filters through the attributes of the task and updates the name
+            Task.objects.filter(pk=task_id).update(task_name=new_name)
+
+            
+    else:
+        form = EditTaskNameForm()
+
+    #renders template, passes form object returns HTTP response
+    return render(request, 'change_task_name.html', {'form': form})    
+
+def change_task_description(request):
+
+    """Handles change in task description."""
+
+    if request.method == 'POST':
+        form = EditTaskDescriptionForm(request.POST)
+        if form.is_valid():
+            # Process the form data 
+            task_id = form.cleaned_data['task_id']
+            new_description = form.cleaned_data['new_description']
+
+            # Perform the task update logic
+            # #Filters through the attributes of the task and updates the description 
+            Task.objects.filter(pk=task_id).update(task_description=new_description)
+
+            
+    else:
+        form = EditTaskDescriptionForm()
+
+    #renders template, passes form object returns HTTP response
+
+    return render(request, 'change_task_description.html', {'form': form})  
+
+
+#def assign_tasks(request):
+    #if request.method == 'POST':
+        #form = AssignTasksForm(request.POST)
+        #if form.is_valid():
+            #selected_team_members = form.cleaned_data['team_members']
+            #return render(request, 'task_assigned.html', {'selected_team_members': selected_team_members})
+    #else:
+        #form = TaskAssignmentForm()
+
+    #return render(request, 'assign_task.html', {'form': form})
+
+
 
 
 

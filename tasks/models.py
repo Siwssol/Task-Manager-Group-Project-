@@ -44,18 +44,25 @@ class User(AbstractUser):
 
         return self.gravatar(size=60)
 
-      
-class Teams(models.Model):
-    """initialises the teams and shows what type of permissions there are """
+
+""" Model in charge of storing user and their respective permission level within the board (restricts interaction ability)"""
+class TeamMembershipStatus(models.Model):
     class Permissions(models.IntegerChoices):
         OWNER = 1
-        ADMIN = 2
-        MEMBER = 3
-        GUEST = 4
+        MEMBER = 2
+        GUEST = 3
+    
+    team = models.ForeignKey('Teams', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    permission_level = models.IntegerField(choices=Permissions.choices, default=Permissions.GUEST)
+
+
+    
+class Teams(models.Model):
+    """initialises the teams and shows what type of permissions there are """
     
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    members = models.ManyToManyField(User, related_name='team_member')
-    permission_level = models.IntegerField(choices=Permissions.choices, default = 4)
+    members = models.ManyToManyField(User, through='TeamMembershipStatus', related_name='team_member')
         
     """function for adding a user to the team"""
     def add_user(self, user):
@@ -65,6 +72,8 @@ class Teams(models.Model):
         #     self.teampermissions.append('owner')
         # else:
         #     self.teampermissions.append('guest')
+    
+
 
     """function for inviting users after team has been initialised"""
     def invite_user(self, user, str):
@@ -133,10 +142,28 @@ class Board(models.Model):
             username = '@' + usernames[0]
             self.team.add_user(username)
     
+
     def invite(self , name, perm):
         self.team.invite_user(name, perm)
 
-    def removemember(self,user):
+        
+    # To fully implement:
+    # Allow board owner to -
+    # Remove specific users from the board
+    
+    def remove_member(self, requesting_user, user_to_remove):
+        # Check if the requesting user is the board owner
+        if self.author != requesting_user:
+            raise PermissionError("Only the board owner can remove members.")
+
+        # Check if the user to be removed is in the team associated with the board
+        if self.team.members.filter(id=user_to_remove.id).exists():
+            self.team.members.remove(user_to_remove)
+        else:
+            raise ValueError("User is not a member of the board")
+
+
+    def removeuser(self , user):
         self.remove_user(user)
 
 
