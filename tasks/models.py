@@ -145,6 +145,8 @@ class Board(models.Model):
 
     def invite(self , name, perm):
         self.team.invite_user(name, perm)
+        
+        
 
         
     # To fully implement:

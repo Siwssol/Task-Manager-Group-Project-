@@ -146,18 +146,17 @@ Drop down menu for the view members button
 
 /* Custom CSS for Navbar Dropdown */
 .navbar .dropdown-menu {
-  margin-top: 0; /* Aligns dropdown menu with the navbar */
+  margin-top: 0; 
 }
 
-/* Style for the dropdown toggle */
+
 .navbar .nav-link.dropdown-toggle {
-  cursor: pointer; /* Changes cursor to pointer */
+  cursor: pointer; 
 }
 
-/* Optional: Style for hover effect on the dropdown items */
 .navbar .dropdown-item:hover {
-  background-color: #f8f9fa; /* Light grey background on hover */
-  color: #007bff; /* Change text color on hover */
+  background-color: #f8f9fa; 
+  color: #007bff; 
 }
 
 /* Custom CSS for Navbar Dropdown with Checkboxes */
@@ -175,6 +174,36 @@ Drop down menu for the view members button
   margin-bottom: 0; /* Remove default bottom margin */
 }
 
+/*
+Adding and removing members button from navbar
+*/
+.dropdown-hover {
+  position: relative;
+}
+
+.dropdown-hover-content {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background-color: #f9f9f9;
+  min-width: 180px; 
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-hover:hover .dropdown-hover-content {
+  display: block;
+}
+
+.dropdown-hover-content .form-control,
+.dropdown-hover-content .btn {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding: 5px;
+  width: 100%; 
+  border-radius: 15px;
+}
 
 
 

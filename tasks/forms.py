@@ -282,10 +282,10 @@ class CreateTaskForm(forms.ModelForm):
         )
         task.save()
         return task
-class AssignTasksForm(forms.Form):
-    available_members = forms.ModelMultipleChoiceField(
-        queryset=Teams.team_members.all(),
-        #Teams.objects.all()
-        widget = forms.CheckboxSelectMultiple
+# class AssignTasksForm(forms.Form):
+#     available_members = forms.ModelMultipleChoiceField(
+#         queryset=Teams.team_members.all(),
+#         #Teams.objects.all()
+#         widget = forms.CheckboxSelectMultiple
 
-    )
+#     )

@@ -10,7 +10,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
-from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm, AssignTasksForm
+from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm
 from tasks.helpers import login_prohibited
 from .forms import EditTaskNameForm, EditTaskDescriptionForm
 from .models import Board, TaskList
@@ -166,7 +166,7 @@ def board(request, board_name):
     """Display specific board"""
     current_user = request.user
     current_board = Board.objects.get(board_name = board_name)
-    current_team = current_board.team
+    current_team = current_board.team    
     if request.method == 'POST':
         # check if board overlay was interacted with or not
         # CODE NEEDS TO BE REFACTORED HERE DUE TO DUPLICATION
