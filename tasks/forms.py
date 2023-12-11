@@ -172,6 +172,8 @@ class CreateBoardForm(forms.ModelForm):
     def emails_to_python(self):
         user_emails = self.cleaned_data.get('team_emails')
         user_emails = user_emails.split(",")
+        for i in range(len(user_emails)):
+            user_emails[i] = user_emails[i].strip()
         return user_emails
     
     """Checks all comma-seperated email values in User model and checks if they exist or not."""
