@@ -109,8 +109,32 @@
         font-size: 13px;
     }
 
+    .ListOptions {
+        z-index: 20;
+        animation: panelAppear 300ms ease-in-out forwards;
+        position: relative;
+        left: 100px;
+
+    }
+
+    @keyframes panelAppear {
+        0% {
+        transform: scaleY(0)
+        }
+        80% {
+            transform: scaleY(1.1)
+        }
+        100% {
+            transform: scaleY(1)
+        }
+    }
+
     body {
         overflow-x: hidden;
+    }
+    
+    .test:hover {
+        background-color: red;
     }
 
 
@@ -288,22 +312,64 @@
                                 <div class="panel-heading">
                                     <button class="Task Task{{ task.id }}" type="button" data-bs-toggle="collapse" data-bs-target="#taskDetails{{ task.id }}" aria-expanded="false" aria-controls="TaskDescription">{{ task.task_name }}
                                         <button class="TaskOptions" type="button" data-bs-toggle="dropdown"><i class="bi bi-arrow-left-right"></i></button>
+
+                                        <ul class="ListOptions dropdown-menu">
+                                        
+                                        <input type="hidden" name="task_id" value="{{ task.id }}">
                                         {% if list.listName == "To Do" %}
-                                            <ul class="dropdown-menu">
-                                                <button>In Progress</button>
-                                                <button>Completed</button>
-                                            </ul>
+                                            <li>
+                                                 <form method="post" action="{% url 'updateTaskLocation' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                 {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_list" value="In Progress">
+                                                    <button class="test" type="submit">In Progress</button>
+                                                 </form>
+                                            </li>
+                                            <li>
+                                                <form method="post" action="{% url 'updateTaskLocation' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_list" value="Completed">
+                                                    <button class="test" type="submit">Completed</button>
+                                                </form>
+                                            </li>
                                         {% elif list.listName == "In Progress" %}
-                                            <ul class="dropdown-menu">
-                                                <button>To Do</button>
-                                                <button>Completed</button>
-                                            </ul>
+                                            <li>
+                                                 <form method="post" action="{% url 'updateTaskLocation' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                 {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_list" value="To Do">
+                                                    <button class="test" type="submit" >To Do</button>
+                                                 </form>
+                                            </li>
+                                            <li>
+                                                <form method="post" action="{% url 'updateTaskLocation' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_list" value="Completed">
+                                                    <button class="test" type="submit">Completed</button>
+                                                </form>
+                                            </li>
                                         {% elif list.listName == "Completed" %}
-                                            <ul class="dropdown-menu">
-                                                <button>To Do</button>
-                                                <button>In Progress</button>
-                                            </ul>
+                                            <li>
+                                                 <form method="post" action="{% url 'updateTaskLocation' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                 {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_list" value="To Do">
+                                                    <button class="test" type="submit" name="In Progress">To Do</button>
+                                                 </form>
+                                            </li>
+                                            <li>
+                                                <form method="post" action="{% url 'updateTaskLocation' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_list" value="In Progress">
+                                                    <button class="test" type="submit">In Progress</button>
+                                                </form>
+                                            </li>
                                         {% endif %}
+                                        </ul>
+
                                     </button>
                                 </div>
                                 <div id="taskDetails{{ task.id }}" class="collapse taskDetails" >
