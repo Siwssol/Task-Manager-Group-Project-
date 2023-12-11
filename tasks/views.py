@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -161,6 +161,25 @@ def change_task_description(request, taskID, board_name):
 def home(request):
     """Display the application's start/home screen."""
     return render(request, 'home.html')
+
+
+def updateTaskLocation(request, taskID, board_name):
+    if request.method == 'POST':
+        new_list = request.POST.get('new_list')
+        print("SOMETHING" ,new_list)
+        print(f"Task ID: {taskID}, New List Name: {new_list}")
+
+        # Your logic to update the task sand move it to the new list goes here
+        task = Task.objects.get(id=taskID)
+        list = TaskList.objects.get(board=board_name, listName=new_list)
+        print(list)
+        task.list_id = list
+        task.save()
+
+        boardName = Task.objects.get(id=taskID).list.board.board_name
+        # Redirect back to the page or wherever you want
+        return HttpResponseRedirect(reverse('board', args=[boardName]))
+
 
 def board(request, board_name):
     """Display specific board"""
