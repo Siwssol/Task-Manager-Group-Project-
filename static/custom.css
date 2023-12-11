@@ -15,15 +15,6 @@
   padding-top: 10px;
 }
 
-.container 
-{
-  /*
-  * home page 
-  * change background colour of main container
-  */
-  background-color:#5A6C5F;
-}
-
 
 .h-100 {
   min-height: 100vh;
@@ -147,5 +138,44 @@ h3.profile-title {
   text-decoration: underline;
   color: #0d6efd;
 }
+
+
+/*
+Drop down menu for the view members button
+*/
+
+/* Custom CSS for Navbar Dropdown */
+.navbar .dropdown-menu {
+  margin-top: 0; /* Aligns dropdown menu with the navbar */
+}
+
+/* Style for the dropdown toggle */
+.navbar .nav-link.dropdown-toggle {
+  cursor: pointer; /* Changes cursor to pointer */
+}
+
+/* Optional: Style for hover effect on the dropdown items */
+.navbar .dropdown-item:hover {
+  background-color: #f8f9fa; /* Light grey background on hover */
+  color: #007bff; /* Change text color on hover */
+}
+
+/* Custom CSS for Navbar Dropdown with Checkboxes */
+.navbar .dropdown-menu .form-check {
+  padding: 0.5rem 1rem; /* Adjust padding for each item */
+  display: flex;
+  align-items: center;
+}
+
+.navbar .dropdown-menu .form-check-input {
+  margin-right: 0.5rem; /* Space between checkbox and label */
+}
+
+.navbar .dropdown-menu .form-check-label {
+  margin-bottom: 0; /* Remove default bottom margin */
+}
+
+
+
 
 

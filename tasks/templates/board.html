@@ -10,7 +10,8 @@
     @media (min-width: 500px) {
         .TaskListCont {
             width: 350px;
-            height: 600px;
+            min-height: 600px;
+            max-height: max-content;
             border-radius: 14px;
             backdrop-filter: blur(10px);
             box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.35);
@@ -28,24 +29,54 @@
         padding-top: 10px;
     }
 
-    .CreateTaskButton,.TaskListName, .ListRow {
-
+    .CreateTaskButton, .TaskListName, .ListRow {
         justify-content: center;
         display: flex;
     }
 
+    .TaskContainer {
+        display: grid;
+        justify-content: center;
+        align-items: center;
+        padding: 5px;
+        width: 320px;
+        height: max-content;
+        margin: 0;
+        inline-size: 300px;
+        overflow-wrap: break-word;
+        border-radius: 8px;
+        box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.35);
+    }
+
+
+    .collapsing {
+        height: 0;
+        overflow: hidden;
+        transition: height 0.15s ease-in-out;
+    }
+
+    .taskDetails, .taskDesc {
+        height: max-content;
+    }
 
     .Task {
-        width: 300px;
-        border-radius: 12px;
-        margin:0 auto;
+        width: 290px;
+        height: max-content;
+        justify-content: center;
+        margin: 0;
+        background-color: white;
+        border-radius: 10px;
+        transition: all 0.15s linear;
         display:block;
+    }
+
+    .Task:active {
+        transform: scale(0.95);
     }
 
     .CreateTaskLink{
         text-decoration: none !important;
     }
-
 
     .taskListContainer {
         position: relative;
@@ -56,7 +87,6 @@
         overflow-x: hidden;
     }
 
-
     .background {
         position: absolute;
         width: 100%;
@@ -66,6 +96,10 @@
         z-index: -1;
     }
 
+    .vcontainer {
+    background-color: #5A6C5F;
+    }
+    
     .wave1 {
         animation: movewave1 14s ease-in-out infinite;
     }
@@ -157,9 +191,10 @@
 
     }
 
-
-
-
+    .containertaskListContainer {
+    position: relative;
+    z-index: 1;
+    }
 
     </style>
 
@@ -220,6 +255,65 @@
         </svg>
     </div>
     <div class="container taskListContainer">
+    <div class="background" >
+        <svg width="115%" height="120%" id="svg" viewBox="0 0 1440 690" xmlns="http://www.w3.org/2000/svg" class="transition duration-300 ease-in-out delay-150">
+            <defs>
+                <linearGradient id="gradient" x1="100%" y1="51%" x2="0%" y2="49%">
+                    <stop offset="5%" stop-color="#8ed1fc">
+
+                    </stop>
+                    <stop offset="95%" stop-color="#0693e3">
+
+                    </stop>
+                </linearGradient>
+            </defs>
+            <path d="M 0,700 C 0,700 0,140 0,140 C 71.7093151693667,164.85033136966126 143.4186303387334,189.70066273932252 200,170 C 256.5813696612666,150.29933726067748 298.03479381443293,86.04768041237112 345,90 C 391.96520618556707,93.95231958762888 444.4421944035347,166.10861561119293 516,170 C 587.5578055964653,173.89138438880707 678.1964285714286,109.51785714285714 747,111 C 815.8035714285714,112.48214285714286 862.7720913107511,179.81995581737849 922,189 C 981.2279086892489,198.18004418262151 1052.715206185567,149.20231958762886 1105,132 C 1157.284793814433,114.79768041237114 1190.367083946981,129.37076583210606 1243,136 C 1295.632916053019,142.62923416789394 1367.8164580265095,141.31461708394698 1440,140 C 1440,140 1440,700 1440,700 Z" stroke="none" stroke-width="0" fill="url(#gradient)" fill-opacity="0.265" class="wave1">
+
+        </path>
+            <defs>
+                <linearGradient id="gradient" x1="100%" y1="51%" x2="0%" y2="49%">
+                    <stop offset="5%" stop-color="#8ed1fc">
+
+                    </stop>
+                    <stop offset="95%" stop-color="#0693e3">
+
+                    </stop>
+                </linearGradient>
+            </defs>
+            <path d="M 0,700 C 0,700 0,280 0,280 C 68.80449189985272,265.59002209131074 137.60898379970544,251.18004418262154 189,254 C 240.39101620029456,256.81995581737846 274.36855670103097,276.86984536082474 335,299 C 395.63144329896903,321.13015463917526 482.91678939617077,345.34057437407955 552,325 C 621.0832106038292,304.65942562592045 671.9642857142857,239.7678571428571 726,230 C 780.0357142857143,220.2321428571429 837.2260677466863,265.5879970544919 888,270 C 938.7739322533137,274.4120029455081 983.1314432989693,237.88015463917526 1052,228 C 1120.8685567010307,218.11984536082474 1214.2481590574375,234.89138438880707 1283,248 C 1351.7518409425625,261.10861561119293 1395.8759204712812,270.55430780559647 1440,280 C 1440,280 1440,700 1440,700 Z" stroke="none" stroke-width="0" fill="url(#gradient)" fill-opacity="0.4" class="wave2">
+
+            </path>
+            <defs>
+                <linearGradient id="gradient" x1="100%" y1="51%" x2="0%" y2="49%">
+                    <stop offset="5%" stop-color="#8ed1fc">
+
+                    </stop>
+                    <stop offset="95%" stop-color="#0693e3">
+
+                    </stop>
+                </linearGradient>
+            </defs>
+            <path d="M 0,700 C 0,700 0,420 0,420 C 62.501840942562595,420.26196612665683 125.00368188512519,420.5239322533137 175,419 C 224.9963181148748,417.4760677466863 262.4871134020618,414.1662371134021 327,415 C 391.5128865979382,415.8337628865979 483.0478645066273,420.81111929307804 543,426 C 602.9521354933727,431.18888070692196 631.3214285714287,436.5892857142857 697,425 C 762.6785714285713,413.4107142857143 865.6664212076586,384.83173784977913 929,367 C 992.3335787923414,349.16826215022087 1016.012886597938,342.0837628865979 1059,369 C 1101.987113402062,395.9162371134021 1164.2820324005893,456.8332106038292 1231,471 C 1297.7179675994107,485.1667893961708 1368.8589837997054,452.5833946980854 1440,420 C 1440,420 1440,700 1440,700 Z" stroke="none" stroke-width="0" fill="url(#gradient)" fill-opacity="0.53" class="wave3">
+
+            </path>
+            <defs>
+                <linearGradient id="gradient" x1="100%" y1="51%" x2="0%" y2="49%">
+                    <stop offset="5%" stop-color="#8ed1fc">
+
+                    </stop>
+                    <stop offset="95%" stop-color="#0693e3">
+
+                    </stop>
+                </linearGradient>
+            </defs>
+            <path d="M 0,700 C 0,700 0,560 0,560 C 59.16200294550809,565.4659425625921 118.32400589101618,570.9318851251841 183,574 C 247.67599410898382,577.0681148748159 317.86597938144337,577.7384020618556 372,582 C 426.13402061855663,586.2615979381444 464.21207658321066,594.1145066273933 524,596 C 583.7879234167893,597.8854933726067 665.2857142857141,593.8035714285714 728,590 C 790.7142857142859,586.1964285714286 834.6450662739323,582.671207658321 884,569 C 933.3549337260677,555.328792341679 988.1340206185566,531.5115979381443 1053,525 C 1117.8659793814434,518.4884020618557 1192.818851251841,529.2824005891016 1259,538 C 1325.181148748159,546.7175994108984 1382.5905743740796,553.3587997054492 1440,560 C 1440,560 1440,700 1440,700 Z" stroke="none" stroke-width="0" fill="url(#gradient)" fill-opacity="1" class="wave4">
+            </path>
+        </svg>
+    </div>
+    {% if permission_level == 3 %}
+        {% include 'partials/board_overlay.html' %}
+    {% endif %}
+        <div class="containertaskListContainer"> 
         <div class="row ListRow">
         {% for list in lists %}
             <div class = "col-4 TaskLists">
@@ -227,18 +321,21 @@
                     <label class="TaskListName">{{ list.listName }}</label>
                     {% for task in tasks %}
                         {% if task.list_id == list.id %}
-                            <div class="panel panel-default">
+                            <div class="panel panel-default TaskContainer">
                                 <div class="panel-heading">
                                     <button class="Task" type="button" data-bs-toggle="collapse" data-bs-target="#taskDetails{{ task.id }}" aria-expanded="false" aria-controls="TaskDescription">{{ task.task_name }}</button>
                                 </div>
                                 <div id="taskDetails{{ task.id }}" class="collapse taskDetails" >
                                     <div class="panel-body">
-                                        <p>{{ task.task_description }}</p>
+                                        <p class="taskDesc">{{ task.task_description }}</p>
                                         <a class="EditTaskNameLink" href="{% url 'change_task_name' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
-                                            <button type="button" class="EditTaskNameButton">Change task Name</button>
+                                            <button type="button" class="EditTaskNameButton">Edit Name</button>
                                         </a>
                                         <a class="EditTaskDescLink" href="{% url 'change_task_description' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
-                                            <button type="button" class="EditTaskDescButton">Change task Description</button>
+                                            <button type="button" class="EditTaskDescButton">Edit Description</button>
+                                        </a>
+                                        <a class="EditTaskDescLink" href="{% url 'change_task_description' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                            <button type="button" class="EditTaskDescButton">Move Task</button>
                                         </a>
                                     </div>
                                 </div>
