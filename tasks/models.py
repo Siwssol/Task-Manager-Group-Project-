@@ -148,7 +148,6 @@ class Board(models.Model):
         
         
 
-        
     # To fully implement:
     # Allow board owner to -
     # Remove specific users from the board

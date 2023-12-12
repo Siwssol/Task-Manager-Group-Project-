@@ -5,6 +5,7 @@ from django.core.validators import RegexValidator
 from .models import User, Board, Teams, Task
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateField
+from django.core.exceptions import ValidationError
 
 
 class LogInForm(forms.Form):
@@ -282,6 +283,34 @@ class CreateTaskForm(forms.ModelForm):
         )
         task.save()
         return task
+    
+    
+    # forms for checkbox -> add member 
+    #
+class AddMemberForm(forms.Form):
+    email = forms.EmailField(label='Member Email')
+
+    def email_exist_in_database(self, email):
+        """Check if the email exists in the User model."""
+        try:
+            User.objects.get(email=email)
+            return True
+        except User.DoesNotExist:
+            return False
+
+    def clean_email(self):
+        """Clean and validate the email field."""
+        email = self.cleaned_data.get('email')
+
+        if not email:
+            raise ValidationError("Email field cannot be blank.")
+
+        if not self.email_exist_in_database(email):
+            raise ValidationError("No user found with this email address.")
+
+        return email
+
+    
 # class AssignTasksForm(forms.Form):
 #     available_members = forms.ModelMultipleChoiceField(
 #         queryset=Teams.team_members.all(),

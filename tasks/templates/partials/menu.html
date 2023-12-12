@@ -12,20 +12,26 @@
                 <ul class="dropdown-menu" aria-labelledby="viewMembersDropdown">
                     {% if board_members %}
                         {% for member in board_members %}
-                            <li class="dropdown-item">{{ member.username }}</li>
+                            {% if member.username != request.user.username %}
+                                <li class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="{{ member.id }}" id="memberCheckbox{{ forloop.counter }}">
+                                    <label class="form-check-label" for="memberCheckbox{{ forloop.counter }}">
+                                        {{ member.username }}
+                                    </label>
+                                </li>
+                            {% endif %}
                         {% endfor %}
-                    {% else %}
-                        <li class="dropdown-item">{{ request.user.username }}</li>
                     {% endif %}
 
-                    <!-- Additional dropdown items -->
                     <li class="nav-item dropdown-hover">
-                        <a class="dropdown-item">Add Member</a>
-                        <div class="dropdown-hover-content">
-                            <input type="email" id="memberEmail" placeholder="Enter member's email" class="form-control">
-                            <button type="button" class="btn btn-primary">Submit</button>
-                        </div>
-                    </li>
+                      <form method="post" action="{% url 'add_member_to_board' board_name= board_name  %}">
+                          {% csrf_token %}
+                          <div class="dropdown-hover-content">
+                              <input type="email" name="memberEmail" id="memberEmail" placeholder="Enter member's email" class="form-control">
+                              <button type="submit" class="btn btn-primary">Submit</button>
+                          </div>
+                      </form>
+                  </li>
                     <li><button class="dropdown-item" type="button">Remove Member</button></li>
                 </ul>
             </li>
