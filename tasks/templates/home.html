@@ -1,26 +1,34 @@
 {% extends 'base.html' %}
 {% block body %}
-<div class="container vh-100">
-    <div class="row h-100">
-      <div class="col-12 my-auto">
-        <div class="card cover-card offset-sm-2 offset-md-4 offset-lg-8">
-            <!-- Changed the title of home page --> 
-          <h1 class="cover-heading">Trello from Wish</h1>
-          <!-- Changed home page description --> 
-          <p class="cover-text">A task manager application by Team <i>Lynx</i></p>
-          <p>
-            <a href='{% url 'sign_up' %}' class="btn btn-lg btn-secondary">
-              Sign up
-            </a>
-          </p>
-          <p>
-            <a href='{% url 'log_in' %}' class="btn btn-lg btn-secondary">
-              Log in
-            </a>
-          </p>
+<!-- Style to add background image -->
+<style>
+body {
+  background-image: url('static/images/background_image.jpg'); 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff; 
+  font-family: 'Helvetica Neue', 'Helvetica', sans-serif; 
+}
+</style>
+
+<div class="container text-center">
+    <div class="row justify-content-center align-items-center vh-100">
+        <div class="col-md-6">
+            <div class="card p-4">
+                <h1 class="h3 mb-4">Trello from Wish</h1>
+                <p class="mb-4">A task manager application by Team <i>Lynx</i></p>
+                <div class="btn-group" role="group">
+                    <a href='{% url 'sign_up' %}' class="btn btn-primary btn-lg mr-2">Sign up</a>
+                    <a href='{% url 'log_in' %}' class="btn btn-secondary btn-lg">Log in</a>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 {% endblock %}
