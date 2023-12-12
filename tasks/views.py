@@ -163,6 +163,10 @@ def home(request):
     return render(request, 'home.html')
 
 
+def achievements(request):
+    current_user = request.user
+    return render(request, 'achievements.html', {'user': current_user})
+
 def updateTaskLocation(request, taskID, board_name):
     if request.method == 'POST':
         new_list = request.POST.get('new_list')
