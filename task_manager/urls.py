@@ -31,9 +31,11 @@ urlpatterns = [
     path('boards/<str:board_name>', views.board, name='board'),
     path('change-task-description/<int:taskID>/<str:board_name>/', views.change_task_description, name='change_task_description'),
     path('change-task-name/<int:taskID>/<str:board_name>/', views.change_task_name, name='change_task_name'),
-    path('createTask/<int:taskListID>/<str:board_name>/', views.createTaskView, name='createTask')
+    path('createTask/<int:taskListID>/<str:board_name>/', views.createTaskView, name='createTask'),
+    path('assign_tasks/<int:taskID>/<str:board_name>/', views.assign_tasks_view, name='assign_tasks_view')
+    
 ]
 
 # Leaving this here until error has been fixed
-path('change-task-name/', views.change_task_description, name='change_task_description'),
-path('change-task-name/', views.change_task_name, name='change_task_name'),
+#path('change-task-name/', views.change_task_description, name='change_task_description'),
+#path('change-task-name/', views.change_task_name, name='change_task_name'),

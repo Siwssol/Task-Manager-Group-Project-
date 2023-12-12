@@ -414,16 +414,50 @@ def change_task_description(request):
     return render(request, 'change_task_description.html', {'form': form})  
 
 
-#def assign_tasks(request):
-    #if request.method == 'POST':
-        #form = AssignTasksForm(request.POST)
-        #if form.is_valid():
-            #selected_team_members = form.cleaned_data['team_members']
-            #return render(request, 'task_assigned.html', {'selected_team_members': selected_team_members})
-    #else:
-        #form = TaskAssignmentForm()
+def assign_tasks_view(request, taskID, board_name):
+    form = AssignTasksForm()
+    if request.method == 'POST':
+        form = AssignTasksForm(request.POST)
+        if form.is_valid():
 
-    #return render(request, 'assign_task.html', {'form': form})
+            task_id = form.cleaned_data.get('taskID')
+            users = form.cleaned_data.get('username')
+
+        
+            task = Task.objects.get(pk=task_id)
+            task.assigned.set(users)
+            print(users)
+
+            context = {
+            'form': form,
+            'taskID': taskID,
+            'board_name': board_name,
+            }
+
+            return render(request, 'assign_tasks.html', context)
+            #return redirect('/board/' + board_name)  
+            # except User.DoesNotExist:
+            #     return render(request, 'assign_tasks.html', {'form': form})
+                
+    else:
+            context = {
+            'form': form,
+            'taskID': taskID,
+            'board_name': board_name,
+            }
+            return render(request, 'assign_tasks.html', context)
+            
+
+
+
+
+            # members = form.username_to_readable()
+            # for mem in members:
+            #     usr = User.objects.get(members = mem)
+            #     Task.assigned.set(usr)
+
+
+    
 
 
 

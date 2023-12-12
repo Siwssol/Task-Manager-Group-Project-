@@ -282,10 +282,80 @@ class CreateTaskForm(forms.ModelForm):
         )
         task.save()
         return task
-class AssignTasksForm(forms.Form):
-    available_members = forms.ModelMultipleChoiceField(
-        queryset=Teams.team_members.all(),
-        #Teams.objects.all()
-        widget = forms.CheckboxSelectMultiple
 
-    )
+
+class AssignTasksForm(forms.Form):
+    class Meta:
+        """Board Form Options"""
+
+        model = Board
+        fields = ['username', 'task-id']
+    def username_to_readable(self):
+        users = self.cleaned_data.get('username')
+        users = users.split(",")
+        for i in range(len(users)):
+            users[i] = users[i].strip()
+        return users
+    def username_exists_in_database(self):
+        users = self.username_to_readable()
+        nonExist = False
+        for usr in users:
+            if(nonExist):
+                break
+            try:
+                User.objects.get(username = usr)
+            except User.DoesNotExist:
+                nonExist = True
+        return nonExist
+    
+    def clean(self):
+        """Clean the data inputted by the user and generate a response if there are any errors."""
+
+        super().clean()
+
+        #board_name = self.cleaned_data.get('board_name')
+        #board_name_result = self.checkBoard(board_name)
+        #if(board_name_result):
+            #self.add_error('board_name','Board name is empty.')
+        
+        
+        users = self.cleaned_data.get('username')
+        username_result = self.check_username(users)
+        if (username_result):
+            self.add_error('username','Inputted usernames is not valid')
+
+    # def checkBoard(self,board_name_to_analyse):
+    #     if (board_name_to_analyse is None):
+    #         return True
+    #     else:
+    #         return False
+    
+    
+
+    def check_username(self,usernames_to_analyse):
+        if (usernames_to_analyse is None):
+            return True
+        else:
+            if (usernames_to_analyse is None):
+                return True
+            elif (usernames_to_analyse == "Enter team emails here if necessary, seperated by commas."):
+                return True
+            else:
+                return self.username_exists_in_database()
+        return False
+
+
+    # def save(self):
+    #     """ Create new board"""
+    #     super().save(commit=False)
+    #     board = Board.objects.create_board(
+    #         #board_name=self.cleaned_data.get('board_name'),
+    #         users=self.cleaned_data.get('username'),
+    #     )
+    # def non_existing_usernames(self):
+    #         existing_users = User.objects.values_list('username', flat=True)
+    #         submitted_users = self.username_to_readable()
+    #         non_existing_users = [user for user in submitted_users if user not in existing_users]
+    #         return non_existing_users
+    
+

@@ -11,7 +11,7 @@
         .TaskListCont {
             width: 350px;
             min-height: 600px;
-            max-height: max-content;
+max-height: max-content;
             border-radius: 14px;
             backdrop-filter: blur(10px);
             box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.35);
@@ -20,7 +20,7 @@
 
     .TaskLists {
         height:300px;
-        padding-top: 40px;
+padding-top: 40px;
         padding-left: 10px;
     }
 
@@ -29,12 +29,12 @@
         padding-top: 10px;
     }
 
-    .CreateTaskButton, .TaskListName, .ListRow {
+.CreateTaskButton, .TaskListName, .ListRow {
         justify-content: center;
         display: flex;
     }
 
-    .TaskContainer {
+.TaskContainer {
         display: grid;
         justify-content: center;
         align-items: center;
@@ -78,6 +78,7 @@
         text-decoration: none !important;
     }
 
+
     .taskListContainer {
         position: relative;
         z-index: 1;
@@ -86,6 +87,7 @@
     body {
         overflow-x: hidden;
     }
+
 
     .background {
         position: absolute;
@@ -99,7 +101,7 @@
     .vcontainer {
     background-color: #5A6C5F;
     }
-    
+
     .wave1 {
         animation: movewave1 14s ease-in-out infinite;
     }
@@ -191,7 +193,7 @@
 
     }
 
-    .containertaskListContainer {
+.containertaskListContainer {
     position: relative;
     z-index: 1;
     }
@@ -199,7 +201,7 @@
     </style>
 
 <body>
-    <div class="background" >
+<div class="background" >
         <svg width="115%" height="120%" id="svg" viewBox="0 0 1440 690" xmlns="http://www.w3.org/2000/svg" class="transition duration-300 ease-in-out delay-150">
             <defs>
                 <linearGradient id="gradient" x1="100%" y1="51%" x2="0%" y2="49%">
@@ -255,7 +257,7 @@
         </svg>
     </div>
     <div class="container taskListContainer">
-    <div class="background" >
+<div class="background" >
         <svg width="115%" height="120%" id="svg" viewBox="0 0 1440 690" xmlns="http://www.w3.org/2000/svg" class="transition duration-300 ease-in-out delay-150">
             <defs>
                 <linearGradient id="gradient" x1="100%" y1="51%" x2="0%" y2="49%">
@@ -330,12 +332,15 @@
                                         <p class="taskDesc">{{ task.task_description }}</p>
                                         <a class="EditTaskNameLink" href="{% url 'change_task_name' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
                                             <button type="button" class="EditTaskNameButton">Edit Name</button>
-                                        </a>
-                                        <a class="EditTaskDescLink" href="{% url 'change_task_description' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+</a>                                    
+                                                                                    <a class="EditTaskDescLink" href="{% url 'change_task_description' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
                                             <button type="button" class="EditTaskDescButton">Edit Description</button>
                                         </a>
                                         <a class="EditTaskDescLink" href="{% url 'change_task_description' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
                                             <button type="button" class="EditTaskDescButton">Move Task</button>
+                                        </a>
+                                        <a class="SelectUser" href="{% url 'assign_tasks_view' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                            <button type="button" class="SelectUserButton">Select User</button>
                                         </a>
                                     </div>
                                 </div>
@@ -346,11 +351,11 @@
 
                 <footer>
                     {% if list.id %}
-                        {%  if list.listName == "To Do" %}
-                            <a class="CreateTaskLink" href="{% url 'createTask' taskListID=list.id board_name=request.resolver_match.kwargs.board_name %}">
-                                <button type="button" class="CreateTaskButton">Add New Task to {{ list.listName }}</button>
-                            </a>
-                        {% endif %}
+{%  if list.listName == "To Do" %}
+                        <a class="CreateTaskLink" href="{% url 'createTask' taskListID=list.id board_name=request.resolver_match.kwargs.board_name %}">
+                            <button type="button" class="CreateTaskButton">Add New Task to {{ list.listName }}</button>
+                        </a>
+{% endif %}
                     {% else %}
                         <p>Error: Invalid taskListID for {{ list.listName }}</p>
                     {% endif %}
@@ -363,6 +368,7 @@
         </div>
 
     </div>
+
 
 </body>
 

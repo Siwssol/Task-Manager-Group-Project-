@@ -1,0 +1,26 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+      <div class="row">
+        <div class="col-12">
+      <form class="form-group" action="{% url 'assign_tasks_view' taskID=taskID board_name=board_name %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <input type="submit" value="SelectUser" class="btn btn-primary">
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+<!-- <form method="post" action="">
+    {% csrf_token %}
+    <label for="your_dropdown">Select an option:</label>
+    <select id="your_dropdown" name="your_dropdown">
+        {% for mem in total_members %}
+            <option value="{{ mem.id }}">{{ mem.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Submit</button>
+</form> -->
+
