@@ -24,7 +24,7 @@
                     {% endif %}
 
                     <li class="nav-item dropdown-hover">
-                      <form method="post" action="{% url 'add_member_to_board' board_name= board_name  %}">
+                      <form method="post" action="{% url 'add_member_to_board' board_name=board_name %}">
                           {% csrf_token %}
                           <div class="dropdown-hover-content">
                               <input type="email" name="memberEmail" id="memberEmail" placeholder="Enter member's email" class="form-control">
