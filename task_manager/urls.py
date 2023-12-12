@@ -35,7 +35,7 @@ urlpatterns = [
     path('assign_tasks/<int:taskID>/<str:board_name>/', views.assign_tasks_view, name='assign_tasks_view')
     
 ]
-
+# You're up to date!
 # Leaving this here until error has been fixed
 #path('change-task-name/', views.change_task_description, name='change_task_description'),
 #path('change-task-name/', views.change_task_name, name='change_task_name'),
