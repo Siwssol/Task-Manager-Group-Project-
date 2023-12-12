@@ -26,6 +26,7 @@ urlpatterns = [
     path('log_out/', views.log_out, name='log_out'),
     path('password/', views.PasswordView.as_view(), name='password'),
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
+    path('achievements/',views.achievements,name='achievements'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('create_board/',views.create_board_view,name='create_board_view'),
     path('boards/<str:board_name>', views.board, name='board'),

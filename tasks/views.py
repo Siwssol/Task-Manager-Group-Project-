@@ -159,6 +159,31 @@ def home(request):
     """Display the application's start/home screen."""
     return render(request, 'home.html')
 
+<<<<<<< Updated upstream
+=======
+def achievements(request):
+    current_user = request.user
+    return render(request, 'achievements.html', {'user': current_user})
+
+def updateTaskLocation(request, taskID, board_name):
+    if request.method == 'POST':
+        new_list = request.POST.get('new_list')
+        print("SOMETHING" ,new_list)
+        print(f"Task ID: {taskID}, New List Name: {new_list}")
+
+        # Your logic to update the task sand move it to the new list goes here
+        task = Task.objects.get(id=taskID)
+        list = TaskList.objects.get(board=board_name, listName=new_list)
+        print(list)
+        task.list_id = list
+        task.save()
+
+        boardName = Task.objects.get(id=taskID).list.board.board_name
+        # Redirect back to the page or wherever you want
+        return HttpResponseRedirect(reverse('board', args=[boardName]))
+
+
+>>>>>>> Stashed changes
 def board(request, board_name):
     """Display specific board"""
     current_user = request.user
