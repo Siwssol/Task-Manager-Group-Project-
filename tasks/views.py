@@ -57,7 +57,7 @@ def create_board_view(request):
             TaskList.objects.create(board = board, listName="In Progress")
             TaskList.objects.create(board = board, listName="Completed")
             boards = Board.objects.all().filter(team__members = current_user)
-            return render(request,'dashboard.html',{'user':current_user, 'boards': boards})
+            return redirect('/dashboard/')
         else:
             return render(request, 'create_board.html', {'form':form})
     else:
@@ -122,7 +122,7 @@ def change_task_name(request, taskID, board_name):
                 for task in tasks:
                     print(task)
                     tasksList.append(task)
-            return redirect('boards/' + board_name)
+            return redirect('/boards/' + board_name)
         else:
             return render(request, 'change_task_name.html', {'form': form})
 
@@ -148,7 +148,7 @@ def change_task_description(request, taskID, board_name):
                 for task in tasks:
                     print(task)
                     tasksList.append(task)
-            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList})
+            return redirect('/boards/' + board_name)
         else:
             return render(request, 'change_task_description.html', {'form': form})
 
