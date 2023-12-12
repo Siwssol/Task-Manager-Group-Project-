@@ -447,7 +447,7 @@ def change_task_description(request):
 
 def add_member_to_board(request, board_name):
     usr = request.user
-    board = get_object_or_404(Board, name=board_name)
+    board = get_object_or_404(Board, board_name= board_name)
     current_team = board.team
     if request.method == 'POST':
         form = AddMemberForm(request.POST)
@@ -466,7 +466,9 @@ def add_member_to_board(request, board_name):
             for field in form:
                 for error in field.errors:
                     messages.error(request, error)
-    return redirect("/board/" + board_name)
+    # In your add_member_to_board view
+    return redirect(reverse('board', kwargs={'board_name': board_name}))
+
 
 
 #def assign_tasks(request):
