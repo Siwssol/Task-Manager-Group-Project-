@@ -2,6 +2,7 @@ from tasks.models import Task
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from datetime import datetime
+from tasks.forms import EditTaskNameForm
 
 
 
@@ -31,3 +32,13 @@ class EditTaskNameTestCase(TestCase):
     def test_new_task_equals_50_characters(self):
         self.task.new_name = 'Lorem ipsum dolor sit amet, consectetuer adipiscin'
         self.assert_task_is_valid()
+
+    def test_save_method(self):
+        form_data = {
+            'task_id': self.task.id,
+            'new_name': 'Updated Task Name',
+        }
+        form = EditTaskNameForm(data=form_data)
+        self.assertTrue(form.is_valid())
+        updated_task = form.save()
+        self.assertEqual(updated_task.task_name, 'Updated Task Name')
