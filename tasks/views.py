@@ -10,7 +10,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
-from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm, AssignTasksForm
+from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm
 from tasks.helpers import login_prohibited
 from .forms import EditTaskNameForm, EditTaskDescriptionForm
 from .models import Board, TaskList
@@ -98,7 +98,7 @@ def createTaskView(request, taskListID, board_name):
             for list in lists:
                 print(list)
             """
-            return render(request, 'board.html',{'user': current_user,'lists': lists, 'tasks': tasksList})
+            return redirect('/boards/' + board_name)
         else:
             return render(request, 'createTask.html', {'form': form})
     else:
@@ -122,7 +122,7 @@ def change_task_name(request, taskID, board_name):
                 for task in tasks:
                     print(task)
                     tasksList.append(task)
-            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList})
+            return redirect('boards/' + board_name)
         else:
             return render(request, 'change_task_name.html', {'form': form})
 
