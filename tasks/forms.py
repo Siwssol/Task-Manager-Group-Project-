@@ -6,6 +6,7 @@ from .models import User, Board, Teams, Task
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateField
 
+
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
 
@@ -111,12 +112,17 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         )
         return user
 
+
+
 class EditTaskNameForm(forms.ModelForm):
+    """Form enabling users to change the task name."""
 
     class Meta:
         model = Task
         fields=['new_name']
 
+    #unique ID used to distinguish between the tasks being edited
+    task_id = forms.IntegerField()
     new_name = forms.CharField(max_length=50, required=True)
 
     def clean(self):
@@ -224,6 +230,8 @@ class CreateBoardForm(forms.ModelForm):
     def checkEmails(self,team_emails_to_analyse,board_type_to_analyse):
         if (board_type_to_analyse == 'Private'):
             return False
+        elif (team_emails_to_analyse is None):
+            return True
         else:
             if (team_emails_to_analyse is None):
                 return True
@@ -276,3 +284,10 @@ class CreateTaskForm(forms.ModelForm):
         )
         task.save()
         return task
+class AssignTasksForm(forms.Form):
+    available_members = forms.ModelMultipleChoiceField(
+        queryset=Teams.team_members.all(),
+        #Teams.objects.all()
+        widget = forms.CheckboxSelectMultiple
+
+    )
