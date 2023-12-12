@@ -2,7 +2,7 @@
  * Alerts
  */
 
-.alert {
+ .alert {
   border-radius: 0px;
 }
 
@@ -11,10 +11,39 @@
  * Cover page
  */
 
-.content {
-  padding-top: 10px;
+.card {
+border: 1px solid #d3d3d3;
+border-radius: 10px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+h1 {
+font-size: 2.5rem;
+font-weight: bold;
+color: #333;
+}
+
+h1 + p {
+font-size: 1.2rem;
+color: #555;
+margin-bottom: 20px;
+}
+
+.btn-primary {
+color: #fff;
+background-color: #007bff;
+border: none;
+}
+
+.btn-secondary {
+color: #fff;
+background-color: #6c757d;
+border: none;
+}
+
+.btn:hover {
+opacity: 0.8;
+}
 
 .h-100 {
   min-height: 100vh;
@@ -26,13 +55,6 @@
     align-items: center;
 }
 
-/*
- * Cover page
- */
-
- /*
-* Change font of text on home page
-*/
 h1.cover-heading {
   font-size: 4rem;
   font-family: "Lucida Console", "Courier New", monospace;
@@ -52,6 +74,7 @@ p.cover-text {
   padding-right: 50px;
   padding-bottom: 30px;
   border-radius: 15%;
+  
 }
 .cover-card-block {
   opacity: 1
@@ -60,16 +83,13 @@ p.cover-text {
 /*
 * Buttons
 */
+
 .btn-secondary {
   background-color:black; 
   border-color: black; 
 }
 
 
-/*
-To implement: 
-
-*/
 
 
 /*
@@ -123,13 +143,6 @@ h3.profile-title {
   font-style: italic;
 }
 
-/*
-* Dashboard
-*/
-
-/*
- * Hyperlinks
- */
 .content a {
   text-decoration: none;
   color: #0d6efd;
@@ -138,6 +151,7 @@ h3.profile-title {
   text-decoration: underline;
   color: #0d6efd;
 }
+
 
 
 /*
@@ -204,7 +218,5 @@ Adding and removing members button from navbar
   width: 100%; 
   border-radius: 15px;
 }
-
-
 
 

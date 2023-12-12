@@ -1,0 +1,114 @@
+    {% extends 'base_content.html' %}
+    {% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Achievements</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Helvetica Neue', 'Helvetica', sans-serif;
+            color: #333;
+        }
+
+        .container {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-bottom: 30px;
+        }
+
+        .achievement-card {
+            background-color: #fff;
+            border: 1px solid #d3d3d3;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .achievement-card:hover {
+            transform: scale(1.02);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .achievement-title {
+            color: #007bff;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .achievement-detail {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .view-details-btn {
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .view-details-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="container">
+        <h2 class="text-center mb-4">Your Achievements</h2>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="achievement-card">
+                    <div class="card-body">
+                        <h3 class="achievement-title">Deleted Boards</h3>
+                        <p class="achievement-detail">You have deleted X boards. Tap for more!</p>
+                        <button class="view-details-btn">View Details</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="achievement-card">
+                    <div class="card-body">
+                        <h3 class="achievement-title">Created Boards</h3>
+                        <p class="achievement-detail">You have created X boards. Tap for more!</p>
+                        <button class="view-details-btn">View Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="achievement-card">
+                    <div class="card-body">
+                        <h3 class="achievement-title">Moved to Doing</h3>
+                        <p class="achievement-detail">You have moved X tasks to To Do. Tap for more!</p>
+                        <button class="view-details-btn">View Details</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="achievement-card">
+                    <div class="card-body">
+                        <h3 class="achievement-title">Moved to Done</h3>
+                        <p class="achievement-detail">You have moved X tasks to Done. Tap for more!</p>
+                        <button class="view-details-btn">View Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+{% endblock %}

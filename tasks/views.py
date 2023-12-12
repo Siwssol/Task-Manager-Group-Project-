@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -59,7 +59,7 @@ def create_board_view(request):
             TaskList.objects.create(board = board, listName="In Progress")
             TaskList.objects.create(board = board, listName="Completed")
             boards = Board.objects.all().filter(team__members = current_user)
-            return render(request,'dashboard.html',{'user':current_user, 'boards': boards})
+            return redirect('/dashboard/')
         else:
             return render(request, 'create_board.html', {'form':form})
     else:
@@ -100,7 +100,7 @@ def createTaskView(request, taskListID, board_name):
             for list in lists:
                 print(list)
             """
-            return render(request, 'board.html',{'user': current_user,'lists': lists, 'tasks': tasksList})
+            return redirect('/boards/' + board_name)
         else:
             return render(request, 'createTask.html', {'form': form})
     else:
@@ -124,7 +124,7 @@ def change_task_name(request, taskID, board_name):
                 for task in tasks:
                     print(task)
                     tasksList.append(task)
-            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList})
+            return redirect('/boards/' + board_name)
         else:
             return render(request, 'change_task_name.html', {'form': form})
 
@@ -150,7 +150,7 @@ def change_task_description(request, taskID, board_name):
                 for task in tasks:
                     print(task)
                     tasksList.append(task)
-            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList})
+            return redirect('/boards/' + board_name)
         else:
             return render(request, 'change_task_description.html', {'form': form})
 
@@ -163,6 +163,29 @@ def change_task_description(request, taskID, board_name):
 def home(request):
     """Display the application's start/home screen."""
     return render(request, 'home.html')
+
+
+def achievements(request):
+    current_user = request.user
+    return render(request, 'achievements.html', {'user': current_user})
+
+def updateTaskLocation(request, taskID, board_name):
+    if request.method == 'POST':
+        new_list = request.POST.get('new_list')
+        print("SOMETHING" ,new_list)
+        print(f"Task ID: {taskID}, New List Name: {new_list}")
+
+        # Your logic to update the task sand move it to the new list goes here
+        task = Task.objects.get(id=taskID)
+        list = TaskList.objects.get(board=board_name, listName=new_list)
+        print(list)
+        task.list_id = list
+        task.save()
+
+        boardName = Task.objects.get(id=taskID).list.board.board_name
+        # Redirect back to the page or wherever you want
+        return HttpResponseRedirect(reverse('board', args=[boardName]))
+
 
 def board(request, board_name):
     """Display specific board"""
