@@ -87,6 +87,23 @@ class Board(models.Model):
                                   )
     team = models.OneToOneField(Teams,on_delete = models.CASCADE)
     
+    def initialiseteam(self):
+        team_users = self.team_emails.split(',')
+        for email in team_users:
+            usernames = email.split('@')
+            username = '@' + usernames[0]
+            self.team.add_user(username)
+    
+
+    def invite(self , name, perm):
+        self.team.invite_user(name, perm)
+        
+        
+
+    # To fully implement:
+    # Allow board owner to -
+    # Remove specific users from the board
+    
     def remove_member(self, requesting_user, user_to_remove):
         # Check if the requesting user is the board owner
         if self.author != requesting_user:

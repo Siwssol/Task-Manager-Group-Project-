@@ -15,6 +15,8 @@ from tasks.helpers import login_prohibited
 from .models import Board, TaskList
 from tasks.models import Board, TaskList, User, Teams, Task, TeamMembershipStatus
 
+#
+from tasks.forms import AddMemberForm
 
 @login_required
 def dashboard(request):
@@ -188,7 +190,13 @@ def board(request, board_name):
     """Display specific board"""
     current_user = request.user
     current_board = Board.objects.get(board_name = board_name)
-    current_team = current_board.team
+    current_team = current_board.team    
+    
+    #changed
+    board_members = current_board.team.members.all()
+
+    ###
+    
     if request.method == 'POST':
         # check if board overlay was interacted with or not
         # CODE NEEDS TO BE REFACTORED HERE DUE TO DUPLICATION
@@ -205,7 +213,7 @@ def board(request, board_name):
                 for task in tasks:
                     print(task)
                     tasksList.append(task)
-            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level})
+            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level, 'board_members': board_members})
         elif 'rejected' in request.POST:
             # remove user's association from the board if they choose to not be a part of it.
             team_membership_obj = TeamMembershipStatus.objects.get(team = current_team, user = current_user)            
@@ -224,7 +232,7 @@ def board(request, board_name):
                 print(task)
                 tasksList.append(task)
 
-        return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level})
+        return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level, "board_name":board_name})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -352,6 +360,32 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+
+def add_member_to_board(request, board_name):
+    usr = request.user
+    board = get_object_or_404(Board, board_name= board_name)
+    current_team = board.team
+    if request.method == 'POST':
+        form = AddMemberForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                user = User.objects.get(email=email)
+                if board.team.members.filter(id=user.id).exists():
+                    messages.error(request, "User is already a member of this board.")
+                else:
+                    TeamMembershipStatus.objects.create(team = current_team, user = user)
+                    messages.success(request, "Member added successfully.")
+            except User.DoesNotExist:
+                messages.error(request, "No user found with this email address.")
+        else:
+            for field in form:
+                for error in field.errors:
+                    messages.error(request, error)
+    # In your add_member_to_board view
+    return redirect(reverse('board', kwargs={'board_name': board_name}))
+
 
 
 #def assign_tasks(request):
