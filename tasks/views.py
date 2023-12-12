@@ -233,7 +233,7 @@ def board(request, board_name):
                 print(task)
                 tasksList.append(task)
 
-        return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level})
+        return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level, "board_name":board_name})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""

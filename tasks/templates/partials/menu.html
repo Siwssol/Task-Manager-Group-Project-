@@ -24,14 +24,17 @@
                     {% endif %}
 
                     <li class="nav-item dropdown-hover">
-                      <form method="post" action="{% url 'add_member_to_board' board_name=board_name %}">
-                          {% csrf_token %}
-                          <div class="dropdown-hover-content">
-                              <input type="email" name="memberEmail" id="memberEmail" placeholder="Enter member's email" class="form-control">
-                              <button type="submit" class="btn btn-primary">Submit</button>
-                          </div>
-                      </form>
-                  </li>
+                      <div class="nav-item dropdown-hover">
+                        <a class="dropdown-item" href="#">Add Member</a>
+                        <div class="dropdown-hover-content">
+                        <form method="post" action="{% url 'add_member_to_board' board_name=board_name %}">
+                            {% csrf_token %}
+                            <div class="dropdown-hover-content">
+                                <input type="email" name="memberEmail" id="memberEmail" placeholder="Enter member's email" class="form-control">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </li>
                     <li><button class="dropdown-item" type="button">Remove Member</button></li>
                 </ul>
             </li>
@@ -45,7 +48,6 @@
       <span class="bi-person-circle"></span>
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="user-account-dropdown">
-      <li><a class="dropdown-item" href="{% url 'achievements' %}">Achievements</a></li>
       <li><a class="dropdown-item" href="{% url 'profile' %}">Change profile</a></li>
       <li><a class="dropdown-item" href="{% url 'password' %}">Change password</a></li>
       <li><hr class="dropdown-divider"></li>
@@ -54,5 +56,7 @@
   </li>
   </ul>
 </div>
+
+
 
 
