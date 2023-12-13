@@ -67,6 +67,7 @@ def create_board_view(request):
 
 
 """Display the Task Creation screen"""
+@login_required
 def createTaskView(request, taskListID, board_name):
     print(taskListID)
     taskList = TaskList.objects.get(pk = taskListID)
@@ -106,7 +107,7 @@ def createTaskView(request, taskListID, board_name):
     else:
         return render(request, 'createTask.html', {'form':form})
 
-
+@login_required
 def change_task_name(request, taskID, board_name):
     task = get_object_or_404(Task, id=taskID)
     if request.method == 'POST':
@@ -132,7 +133,7 @@ def change_task_name(request, taskID, board_name):
         form = EditTaskNameForm(instance=task, initial={'board_name': board_name})
     return render(request, 'change_task_name.html', {'form': form})
 
-
+@login_required
 def change_task_description(request, taskID, board_name):
     task = get_object_or_404(Task, id=taskID)
     if request.method == 'POST':
@@ -186,7 +187,7 @@ def updateTaskLocation(request, taskID, board_name):
         # Redirect back to the page or wherever you want
         return HttpResponseRedirect(reverse('board', args=[boardName]))
 
-
+@login_required
 def board(request, board_name):
     """Display specific board"""
     current_user = request.user
@@ -214,7 +215,7 @@ def board(request, board_name):
                 for task in tasks:
                     print(task)
                     tasksList.append(task)
-            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level, 'board_members': board_members})
+            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level, "board_members": board_members})
         elif 'rejected' in request.POST:
             # remove user's association from the board if they choose to not be a part of it.
             team_membership_obj = TeamMembershipStatus.objects.get(team = current_team, user = current_user)            
@@ -233,7 +234,7 @@ def board(request, board_name):
                 print(task)
                 tasksList.append(task)
 
-        return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level, "board_name":board_name})
+        return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level, "board_name":board_name, "board_members": board_members})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -326,7 +327,6 @@ class PasswordView(LoginRequiredMixin, FormView):
         messages.add_message(self.request, messages.SUCCESS, "Password updated!")
         return reverse('dashboard')
 
-
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     """Display user profile editing screen, and handle profile modifications."""
 
@@ -361,6 +361,7 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+    
 
 @login_required
 def add_member_to_board(request, board_name):
@@ -393,7 +394,6 @@ def add_member_to_board(request, board_name):
 def remove_member_from_board(request, board_name):
     current_user = request.user
     board = get_object_or_404(Board, board_name=board_name)
-
     if not board.author == current_user:
         messages.error(request, "Only the board owner can remove members.")
         return redirect(reverse('board', kwargs={'board_name': board_name}))
@@ -404,7 +404,9 @@ def remove_member_from_board(request, board_name):
             email = form.cleaned_data['email']
             try:
                 user_to_remove = User.objects.get(email=email)
-                if board.team.members.filter(id=user_to_remove.id).exists():
+                if user_to_remove == board.author:
+                    messages.error(request, "You cannot remove yourself from the board.")
+                elif board.team.members.filter(id=user_to_remove.id).exists():
                     board.team.members.remove(user_to_remove)
                     messages.success(request, "Member removed successfully.")
                 else:
@@ -415,8 +417,23 @@ def remove_member_from_board(request, board_name):
             for field in form:
                 for error in field.errors:
                     messages.error(request, error)
-
     return redirect(reverse('board', kwargs={'board_name': board_name}))
+
+
+@login_required
+def delete_board(request, board_name):
+    board = get_object_or_404(Board, board_name=board_name)
+
+    # Check if the current user is the author of the board
+    if request.user != board.author:
+        messages.error(request, "You do not have permission to delete this board.")
+        return redirect(reverse('board', kwargs={'board_name': board_name}))
+
+    # Perform deletion
+    board.delete()
+    messages.success(request, "Board deleted successfully.")
+    return redirect('dashboard')
+
 
 
 
