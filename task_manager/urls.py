@@ -35,6 +35,7 @@ urlpatterns = [
     path('createTask/<int:taskListID>/<str:board_name>/', views.createTaskView, name='createTask'),
 
     path('board/<str:board_name>/add_member/', views.add_member_to_board, name='add_member_to_board'),
+    path('board/<str:board_name>/remove_member/', views.remove_member_from_board, name='remove_member_from_board'),
     path('updateTaskLocation/<int:taskID>/<str:board_name>', views.updateTaskLocation, name='updateTaskLocation')
 ]
 

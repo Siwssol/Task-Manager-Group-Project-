@@ -221,7 +221,7 @@ class CreateBoardForm(forms.ModelForm):
             return False
     
     def checkBoardType(self,board_type_to_analyse):
-        return (board_type_to_analyse == "INVALID"):
+        if (board_type_to_analyse == "INVALID"):
             return True
         else:
             return False
@@ -309,6 +309,32 @@ class AddMemberForm(forms.Form):
             raise ValidationError("No user found with this email address.")
 
         return email
+
+#forms for checkbox -> remove member 
+
+class RemoveMemberForm(forms.Form):
+    email = forms.EmailField(label='Member Email')
+
+    def email_exist_in_database(self, email):
+        """Check if the email exists in the User model."""
+        try:
+            User.objects.get(email=email)
+            return True
+        except User.DoesNotExist:
+            return False
+
+    def clean_email(self):
+        """Clean and validate the email field."""
+        email = self.cleaned_data.get('email')
+
+        if not email:
+            raise ValidationError("Email field cannot be blank.")
+
+        if not self.email_exist_in_database(email):
+            raise ValidationError("No user found with this email address.")
+
+        return email
+
 
     
 # class AssignTasksForm(forms.Form):

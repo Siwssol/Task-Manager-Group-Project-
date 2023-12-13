@@ -17,6 +17,7 @@ from tasks.models import Board, TaskList, User, Teams, Task, TeamMembershipStatu
 
 #
 from tasks.forms import AddMemberForm
+from tasks.forms import RemoveMemberForm
 
 @login_required
 def dashboard(request):
@@ -361,7 +362,7 @@ class SignUpView(LoginProhibitedMixin, FormView):
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
-
+@login_required
 def add_member_to_board(request, board_name):
     usr = request.user
     board = get_object_or_404(Board, board_name= board_name)
@@ -385,6 +386,38 @@ def add_member_to_board(request, board_name):
                     messages.error(request, error)
     # In your add_member_to_board view
     return redirect(reverse('board', kwargs={'board_name': board_name}))
+
+
+
+@login_required
+def remove_member_from_board(request, board_name):
+    current_user = request.user
+    board = get_object_or_404(Board, board_name=board_name)
+
+    if not board.author == current_user:
+        messages.error(request, "Only the board owner can remove members.")
+        return redirect(reverse('board', kwargs={'board_name': board_name}))
+
+    if request.method == 'POST':
+        form = RemoveMemberForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                user_to_remove = User.objects.get(email=email)
+                if board.team.members.filter(id=user_to_remove.id).exists():
+                    board.team.members.remove(user_to_remove)
+                    messages.success(request, "Member removed successfully.")
+                else:
+                    messages.error(request, "User is not a member of this board.")
+            except User.DoesNotExist:
+                messages.error(request, "No user found with this email address.")
+        else:
+            for field in form:
+                for error in field.errors:
+                    messages.error(request, error)
+
+    return redirect(reverse('board', kwargs={'board_name': board_name}))
+
 
 
 
