@@ -91,4 +91,20 @@ class NewBoardTest(TestCase):
         form = CreateBoardForm(data = self.form_input)
         self.assertTrue(form.is_valid())
 
+    def test_invalid_board_type(self):
+        form_data = {
+            'board_name': 'Test Board',
+            'board_type': 'INVALID',
+            'team_emails': 'abcd@gmail.com.com, abcd1@gmail.com',
+        }
+        form = CreateBoardForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors['board_type'], ['Select a valid option.'])
+
+
+    def test_case_insensitive_emails(self):
+        self.form_input['board_members'] = 'Abcd@Gmail.com, ABCD1@GMAIL.COM'
+        form = CreateBoardForm(data=self.form_input)
+        self.assertTrue(form.is_valid())
+
 
