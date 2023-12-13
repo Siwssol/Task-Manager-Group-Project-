@@ -394,7 +394,7 @@ def add_member_to_board(request, board_name):
                 for error in field.errors:
                     messages.error(request, error)
     # In your add_member_to_board view
-    return redirect(reverse('board', kwargs={'board_name': board_name}))
+    return HttpResponseRedirect(reverse('board', args=[board_name]))
 
 
 @login_required
