@@ -5,6 +5,7 @@ from django.core.validators import RegexValidator
 from .models import User, Board, Teams, Task
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateField
+from django.core.exceptions import ValidationError
 
 
 class LogInForm(forms.Form):
@@ -275,4 +276,5 @@ class CreateTaskForm(forms.ModelForm):
         )
         task.save()
         return task
+
 
