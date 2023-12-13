@@ -15,8 +15,7 @@ from tasks.helpers import login_prohibited
 from .models import Board, TaskList
 from tasks.models import Board, TaskList, User, Teams, Task, TeamMembershipStatus
 
-#
-from tasks.forms import AddMemberForm
+
 
 @login_required
 def dashboard(request):
@@ -393,19 +392,6 @@ def add_member_to_board(request, board_name):
                     messages.error(request, error)
     # In your add_member_to_board view
     return redirect(reverse('board', kwargs={'board_name': board_name}))
-
-
-
-#def assign_tasks(request):
-    #if request.method == 'POST':
-        #form = AssignTasksForm(request.POST)
-        #if form.is_valid():
-            #selected_team_members = form.cleaned_data['team_members']
-            #return render(request, 'task_assigned.html', {'selected_team_members': selected_team_members})
-    #else:
-        #form = TaskAssignmentForm()
-
-    #return render(request, 'assign_task.html', {'form': form})
 
 
 
