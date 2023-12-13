@@ -10,10 +10,11 @@ from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
-from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm
+from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm, RemoveMemberForm
 from tasks.helpers import login_prohibited
 from .models import Board, TaskList
 from tasks.models import Board, TaskList, User, Teams, Task, TeamMembershipStatus
+
 
 
 
