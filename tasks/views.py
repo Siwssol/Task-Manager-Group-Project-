@@ -181,9 +181,17 @@ def updateTaskLocation(request, taskID, board_name):
         task.list_id = list
         task.save()
 
-        boardName = Task.objects.get(id=taskID).list.board.board_name
         # Redirect back to the page or wherever you want
-        return HttpResponseRedirect(reverse('board', args=[boardName]))
+        return HttpResponseRedirect(reverse('board', args=[board_name]))
+
+def updateTaskPriority(request, taskID, board_name):
+    if request.method == 'POST':
+        new_priority = request.POST.get('new_priority')
+        task = Task.objects.get(id=taskID)
+        task.task_priority = new_priority
+        task.save()
+
+        return HttpResponseRedirect(reverse('board', args=[board_name]))
 
 
 def board(request, board_name):

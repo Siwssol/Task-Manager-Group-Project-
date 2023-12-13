@@ -272,7 +272,8 @@ class CreateTaskForm(forms.ModelForm):
         task = Task.objects.create_task(
             task_name = self.cleaned_data.get('task_name'),
             task_description = self.cleaned_data.get('task_description'),
-            due_date = self.cleaned_data.get('due_date')
+            due_date = self.cleaned_data.get('due_date'),
+            task_priority = "NONE"
         )
         task.save()
         return task
