@@ -39,7 +39,6 @@ urlpatterns = [
     path('updateTaskLocation/<int:taskID>/<str:board_name>', views.updateTaskLocation, name='updateTaskLocation'),
     path('updateTaskPriority/<int:taskID>/<str:board_name>', views.updateTaskPriority, name='updateTaskPriority')
 
-]
 
 
 
