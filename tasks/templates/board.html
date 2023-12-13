@@ -56,6 +56,23 @@
         box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.35);
     }
 
+    .LOW {
+        border-color: green;
+        border-style: solid;
+        box-shadow: 0px 5px 15px 0px rgba(0, 255, 0, 0.35);
+    }
+    .MID {
+        border-style: solid;
+        border-color: yellow;
+        box-shadow: 0px 5px 15px 0px rgba(255, 255, 0, 0.35);
+    }
+    .HIGH {
+        border-style: solid;
+        border-color: red;
+        box-shadow: 0px 5px 15px 0px rgba(255, 0, 0, 0.35);
+    }
+    
+
 
     .collapsing {
         height: 0;
@@ -79,6 +96,10 @@
         border-radius: 10px;
         transition: all 0.15s linear;
         display:block;
+    }
+
+    .taskName {
+        width: 250px;
     }
 
     .Task:active {
@@ -376,9 +397,18 @@
                     <label class="TaskListName">{{ list.listName }}</label>
                     {% for task in tasks %}
                         {% if task.list_id == list.id %}
-                            <div class="panel panel-default TaskContainer">
+
+                            {% if task.task_priority == "NONE" %}
+                                <div class="panel panel-default TaskContainer">
+                            {% elif task.task_priority == "LOW" %}
+                                <div class="panel panel-default TaskContainer LOW">
+                            {% elif task.task_priority == "MID" %}
+                                <div class="panel panel-default TaskContainer MID">
+                            {% elif task.task_priority == "HIGH" %}
+                                <div class="panel panel-default TaskContainer HIGH">
+                            {% endif %}
                                 <div class="panel-heading">
-                                    <button class="Task Task{{ task.id }}" type="button" data-bs-toggle="collapse" data-bs-target="#taskDetails{{ task.id }}" aria-expanded="false" aria-controls="TaskDescription">{{ task.task_name }}
+                                    <button class="Task Task{{ task.id }}" type="button" data-bs-toggle="collapse" data-bs-target="#taskDetails{{ task.id }}" aria-expanded="false" aria-controls="TaskDescription"><label class="taskName">{{ task.task_name }}</label>
                                         <button class="TaskOptions" type="button" data-bs-toggle="dropdown"><i class="bi bi-arrow-left-right"></i></button>
 
                                         <ul class="ListOptions dropdown-menu">
@@ -443,12 +473,49 @@
                                 <div id="taskDetails{{ task.id }}" class="collapse taskDetails" >
                                     <div class="panel-body">
                                         <p class="taskDesc">{{ task.task_description }}</p>
+                                        <p class="dueDate">{{ task.due_date }}</p>
                                         <a class="EditTaskNameLink" href="{% url 'change_task_name' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
                                             <button type="button" class="EditTaskNameButton">Edit Name</button>
                                         </a>
                                         <a class="EditTaskDescLink" href="{% url 'change_task_description' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
                                             <button type="button" class="EditTaskDescButton">Edit Description</button>
                                         </a>
+                                        <button class="TaskPriorityChange" type="button" data-bs-toggle="dropdown">Change Priority</button>
+                                        <ul class="PriorityOptions dropdown-menu">
+                                            <li>
+                                                 <form method="post" action="{% url 'updateTaskPriority' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                 {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_priority" value="NONE">
+                                                    <button class="test" type="submit">NONE</button>
+                                                 </form>
+                                            </li>
+                                            <li>
+                                                 <form method="post" action="{% url 'updateTaskPriority' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                 {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_priority" value="LOW">
+                                                    <button class="test" type="submit">LOW</button>
+                                                 </form>
+                                            </li>
+                                            <li>
+                                                 <form method="post" action="{% url 'updateTaskPriority' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                 {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_priority" value="MID">
+                                                    <button class="test" type="submit">MID</button>
+                                                 </form>
+                                            </li>
+                                            <li>
+                                                 <form method="post" action="{% url 'updateTaskPriority' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                 {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_priority" value="HIGH">
+                                                    <button class="test" type="submit">HIGH</button>
+                                                 </form>
+                                            </li>
+                                        </ul>
+
 
                                     </div>
                                 </div>
