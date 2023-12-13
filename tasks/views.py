@@ -395,6 +395,52 @@ def add_member_to_board(request, board_name):
     return redirect(reverse('board', kwargs={'board_name': board_name}))
 
 
+@login_required
+def remove_member_from_board(request, board_name):
+    current_user = request.user
+    board = get_object_or_404(Board, board_name=board_name)
+    if not board.author == current_user:
+        messages.error(request, "Only the board owner can remove members.")
+        return redirect(reverse('board', kwargs={'board_name': board_name}))
+
+    if request.method == 'POST':
+        form = RemoveMemberForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                user_to_remove = User.objects.get(email=email)
+                if user_to_remove == board.author:
+                    messages.error(request, "You cannot remove yourself from the board.")
+                elif board.team.members.filter(id=user_to_remove.id).exists():
+                    board.team.members.remove(user_to_remove)
+                    messages.success(request, "Member removed successfully.")
+                else:
+                    messages.error(request, "User is not a member of this board.")
+            except User.DoesNotExist:
+                messages.error(request, "No user found with this email address.")
+        else:
+            for field in form:
+                for error in field.errors:
+                    messages.error(request, error)
+    return redirect(reverse('board', kwargs={'board_name': board_name}))
+
+#comment
+
+@login_required
+def delete_board(request, board_name):
+    board = get_object_or_404(Board, board_name=board_name)
+
+    # Check if the current user is the author of the board
+    if request.user != board.author:
+        messages.error(request, "You do not have permission to delete this board.")
+        return redirect(reverse('board', kwargs={'board_name': board_name}))
+
+    # Perform deletion
+    board.delete()
+    messages.success(request, "Board deleted successfully.")
+    return redirect('dashboard')
+
+
 
 
 
