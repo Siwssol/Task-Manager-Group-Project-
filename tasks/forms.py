@@ -152,7 +152,7 @@ class EditTaskDescriptionForm(forms.ModelForm):
        cleaned_data = super().clean()
        new_task_description = cleaned_data.get("new_description")
        if new_task_description is not None and len(new_task_description) > 1000:
-           self.add_error("new_description", "Task name length cannot exceed 1000")
+           self.add_error("new_description", "Task description length cannot exceed 1000")
 
     def save(self, commit = True):
         instance = super().save(commit=False)
@@ -214,26 +214,19 @@ class CreateBoardForm(forms.ModelForm):
             self.add_error('team_emails','Inputted emails is not valid')
 
     def checkBoard(self,board_name_to_analyse):
-        if (board_name_to_analyse is None):
-            return True
-        else:
-            return False
+        return (board_name_to_analyse is None)
+
     
     def checkBoardType(self,board_type_to_analyse):
-        return (board_type_to_analyse == "INVALID"):
-            return True
-        else:
-            return False
+        return (board_type_to_analyse == "INVALID")
 
     def checkEmails(self,team_emails_to_analyse,board_type_to_analyse):
         if (board_type_to_analyse == 'Private'):
             return False
-        elif (team_emails_to_analyse is None):
+        if (team_emails_to_analyse is None):
             return True
         else:
-            if (team_emails_to_analyse is None):
-                return True
-            elif (team_emails_to_analyse == "Enter team emails here if necessary, seperated by commas." and (board_type_to_analyse == 'INVALID' or board_type_to_analyse == 'Team')):
+            if (team_emails_to_analyse == "Enter team emails here if necessary, seperated by commas." and (board_type_to_analyse == 'INVALID' or board_type_to_analyse == 'Team')):
                 return True
             else:
                 return self.emails_exist_in_database()
@@ -283,12 +276,3 @@ class CreateTaskForm(forms.ModelForm):
         task.save()
         return task
 
-    """
-class AssignTasksForm(forms.Form):
-    available_members = forms.ModelMultipleChoiceField(
-        queryset=Teams.team_members.all(),
-        #Teams.objects.all()
-        widget = forms.CheckboxSelectMultiple
-
-    )
-"""
