@@ -5,6 +5,7 @@ from django.core.validators import RegexValidator
 from .models import User, Board, Teams, Task
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateField
+from django.core.exceptions import ValidationError
 
 
 class LogInForm(forms.Form):
@@ -121,8 +122,6 @@ class EditTaskNameForm(forms.ModelForm):
         model = Task
         fields=['new_name']
 
-    #unique ID used to distinguish between the tasks being edited
-    task_id = forms.IntegerField()
     new_name = forms.CharField(max_length=50, required=True)
 
     def clean(self):
@@ -148,18 +147,18 @@ class EditTaskDescriptionForm(forms.ModelForm):
         model = Task
         fields=['new_description']
 
-    new_description = forms.CharField(max_length=50)
+    new_description = forms.CharField(widget=forms.Textarea(attrs={'maxlength': 1000}))
 
     def clean(self):
        cleaned_data = super().clean()
-       new_task_description = cleaned_data.get("new_name")
+       new_task_description = cleaned_data.get("new_description")
        if new_task_description is not None and len(new_task_description) > 1000:
-           self.add_error("new_description", "Task name length cannot exceed 1000")
+           self.add_error("new_description", "Task description length cannot exceed 1000")
 
     def save(self, commit = True):
         instance = super().save(commit=False)
-        new_task_name = self.cleaned_data['new_description']
-        instance.task_name = new_task_name
+        new_task_description = self.cleaned_data['new_description']
+        instance.task_name = new_task_description
         if commit:
             instance.save()
         return instance
@@ -216,26 +215,24 @@ class CreateBoardForm(forms.ModelForm):
             self.add_error('team_emails','Inputted emails is not valid')
 
     def checkBoard(self,board_name_to_analyse):
-        if (board_name_to_analyse is None):
-            return True
-        else:      
-            return False
+        return (board_name_to_analyse is None)
+
     
     def checkBoardType(self,board_type_to_analyse):
         if (board_type_to_analyse == "INVALID"):
             return True
         else:
             return False
+        return (board_type_to_analyse == "INVALID")
+
 
     def checkEmails(self,team_emails_to_analyse,board_type_to_analyse):
         if (board_type_to_analyse == 'Private'):
             return False
-        elif (team_emails_to_analyse is None):
+        if (team_emails_to_analyse is None):
             return True
         else:
-            if (team_emails_to_analyse is None):
-                return True
-            elif (team_emails_to_analyse == "Enter team emails here if necessary, seperated by commas." and (board_type_to_analyse == 'INVALID' or board_type_to_analyse == 'Team')):
+            if (team_emails_to_analyse == "Enter team emails here if necessary, seperated by commas." and (board_type_to_analyse == 'INVALID' or board_type_to_analyse == 'Team')):
                 return True
             else:
                 return self.emails_exist_in_database()
@@ -280,14 +277,62 @@ class CreateTaskForm(forms.ModelForm):
         task = Task.objects.create_task(
             task_name = self.cleaned_data.get('task_name'),
             task_description = self.cleaned_data.get('task_description'),
-            due_date = self.cleaned_data.get('due_date')
+            due_date = self.cleaned_data.get('due_date'),
+            task_priority = "NONE"
         )
         task.save()
         return task
-class AssignTasksForm(forms.Form):
-    available_members = forms.ModelMultipleChoiceField(
-        queryset=Teams.team_members.all(),
-        #Teams.objects.all()
-        widget = forms.CheckboxSelectMultiple
 
-    )
+
+class AddMemberForm(forms.Form):
+    email = forms.EmailField(label='Member Email')
+
+    def email_exist_in_database(self, email):
+        """Check if the email exists in the User model."""
+        try:
+            User.objects.get(email=email)
+            return True
+        except User.DoesNotExist:
+            return False
+
+    def clean_email(self):
+        """Clean and validate the email field."""
+        email = self.cleaned_data.get('email')
+
+        if not email:
+            raise ValidationError("Email field cannot be blank.")
+
+        if not self.email_exist_in_database(email):
+            raise ValidationError("No user found with this email address.")
+
+        return email
+
+
+#forms for checkbox -> remove member 
+
+class RemoveMemberForm(forms.Form):
+    email = forms.EmailField(label='Member Email')
+
+
+    def email_exist_in_database(self, email):
+        """Check if the email exists in the User model."""
+        try:
+            User.objects.get(email=email)
+            return True
+        except User.DoesNotExist:
+            return False
+
+    def clean_email(self):
+        """Clean and validate the email field."""
+        email = self.cleaned_data.get('email')
+
+        if not email:
+            raise ValidationError("Email field cannot be blank.")
+
+        if not self.email_exist_in_database(email):
+            raise ValidationError("No user found with this email address.")
+
+        return email
+
+
+

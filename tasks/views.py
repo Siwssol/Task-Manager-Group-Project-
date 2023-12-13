@@ -10,11 +10,13 @@ from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
-from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm
+from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm, RemoveMemberForm
 from tasks.helpers import login_prohibited
-from .forms import EditTaskNameForm, EditTaskDescriptionForm
 from .models import Board, TaskList
 from tasks.models import Board, TaskList, User, Teams, Task, TeamMembershipStatus
+from tasks.forms import AddMemberForm
+from tasks.forms import RemoveMemberForm
+
 
 
 @login_required
@@ -65,6 +67,7 @@ def create_board_view(request):
 
 
 """Display the Task Creation screen"""
+@login_required
 def createTaskView(request, taskListID, board_name):
     print(taskListID)
     taskList = TaskList.objects.get(pk = taskListID)
@@ -104,7 +107,7 @@ def createTaskView(request, taskListID, board_name):
     else:
         return render(request, 'createTask.html', {'form':form})
 
-
+@login_required
 def change_task_name(request, taskID, board_name):
     task = get_object_or_404(Task, id=taskID)
     if request.method == 'POST':
@@ -130,7 +133,7 @@ def change_task_name(request, taskID, board_name):
         form = EditTaskNameForm(instance=task, initial={'board_name': board_name})
     return render(request, 'change_task_name.html', {'form': form})
 
-
+@login_required
 def change_task_description(request, taskID, board_name):
     task = get_object_or_404(Task, id=taskID)
     if request.method == 'POST':
@@ -180,16 +183,30 @@ def updateTaskLocation(request, taskID, board_name):
         task.list_id = list
         task.save()
 
-        boardName = Task.objects.get(id=taskID).list.board.board_name
         # Redirect back to the page or wherever you want
-        return HttpResponseRedirect(reverse('board', args=[boardName]))
+        return HttpResponseRedirect(reverse('board', args=[board_name]))
 
+def updateTaskPriority(request, taskID, board_name):
+    if request.method == 'POST':
+        new_priority = request.POST.get('new_priority')
+        task = Task.objects.get(id=taskID)
+        task.task_priority = new_priority
+        task.save()
 
+        return HttpResponseRedirect(reverse('board', args=[board_name]))
+
+@login_required
 def board(request, board_name):
     """Display specific board"""
     current_user = request.user
     current_board = Board.objects.get(board_name = board_name)
-    current_team = current_board.team
+    current_team = current_board.team    
+    
+    #changed
+    board_members = current_board.team.members.all()
+
+    ###
+    
     if request.method == 'POST':
         # check if board overlay was interacted with or not
         # CODE NEEDS TO BE REFACTORED HERE DUE TO DUPLICATION
@@ -206,7 +223,7 @@ def board(request, board_name):
                 for task in tasks:
                     print(task)
                     tasksList.append(task)
-            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level})
+            return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level, "board_members": board_members})
         elif 'rejected' in request.POST:
             # remove user's association from the board if they choose to not be a part of it.
             team_membership_obj = TeamMembershipStatus.objects.get(team = current_team, user = current_user)            
@@ -225,7 +242,7 @@ def board(request, board_name):
                 print(task)
                 tasksList.append(task)
 
-        return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level})
+        return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level, "board_name":board_name, "board_members": board_members})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -318,7 +335,6 @@ class PasswordView(LoginRequiredMixin, FormView):
         messages.add_message(self.request, messages.SUCCESS, "Password updated!")
         return reverse('dashboard')
 
-
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     """Display user profile editing screen, and handle profile modifications."""
 
@@ -353,88 +369,128 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-
-"""
-def change_task_name(request):
-    if request.method == 'POST':
-        form = EditTaskNameForm(request.POST)
-        if form.is_valid():
-            # Process the form data 
-            task_id = form.cleaned_data['task_id']
-            new_name = form.cleaned_data['new_name']
-
-            # Perform the task update logic 
-            Task.objects.filter(id=task_id).update(task_name=new_name)
-            
-    else:
-        form = EditTaskNameForm()
-
-    return render(request, 'change_task_name.html', {'form': form})    
-
-
-def change_task_description(request):
-    if request.method == 'POST':
-        form = EditTaskDescriptionForm(request.POST)
-        if form.is_valid():
-            # Process the form data 
-            task_id = form.cleaned_data['task_id']
-            new_description = form.cleaned_data['new_description']
-
-            # Perform the task update logic 
-            Task.objects.filter(id=task_id).update(task_name=new_description)
-
-            
-    else:
-        form = EditTaskDescriptionForm()
-
-    return render(request, 'change_task_description.html', {'form': form})  
-"""
-
-def change_task_name(request):
-
-    """Handles change in task name."""
-
-    if request.method == 'POST':
-        form = EditTaskNameForm(request.POST)
-        if form.is_valid():
-            # Process the form data 
-            task_id = form.cleaned_data['task_id']
-            new_name = form.cleaned_data['new_name']
     
 
-            # Perform the task update logic :
-            #Filters through the attributes of the task and updates the name
-            Task.objects.filter(pk=task_id).update(task_name=new_name)
+@login_required
+def add_member_to_board(request, board_name):
+    usr = request.user
+    board = get_object_or_404(Board, board_name= board_name)
+    current_team = board.team
+    if request.method == 'POST':
+        form = AddMemberForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                user = User.objects.get(email=email)
+                if board.team.members.filter(id=user.id).exists():
+                    messages.error(request, "User is already a member of this board.")
+                else:
+                    TeamMembershipStatus.objects.create(team = current_team, user = user)
+                    messages.success(request, "Member added successfully.")
+            except User.DoesNotExist:
+                messages.error(request, "No user found with this email address.")
+        else:
+            for field in form:
+                for error in field.errors:
+                    messages.error(request, error)
+    # In your add_member_to_board view
+    return HttpResponseRedirect(reverse('board', args=[board_name]))
 
-            
-    else:
-        form = EditTaskNameForm()
 
-    #renders template, passes form object returns HTTP response
-    return render(request, 'change_task_name.html', {'form': form})    
-
-def change_task_description(request):
-
-    """Handles change in task description."""
+@login_required
+def remove_member_from_board(request, board_name):
+    current_user = request.user
+    board = get_object_or_404(Board, board_name=board_name)
+    if not board.author == current_user:
+        messages.error(request, "Only the board owner can remove members.")
+        return redirect(reverse('board', kwargs={'board_name': board_name}))
 
     if request.method == 'POST':
-        form = EditTaskDescriptionForm(request.POST)
+        form = RemoveMemberForm(request.POST)
         if form.is_valid():
-            # Process the form data 
-            task_id = form.cleaned_data['task_id']
-            new_description = form.cleaned_data['new_description']
+            email = form.cleaned_data['email']
+            try:
+                user_to_remove = User.objects.get(email=email)
+                if user_to_remove == board.author:
+                    messages.error(request, "You cannot remove yourself from the board.")
+                elif board.team.members.filter(id=user_to_remove.id).exists():
+                    board.team.members.remove(user_to_remove)
+                    messages.success(request, "Member removed successfully.")
+                else:
+                    messages.error(request, "User is not a member of this board.")
+            except User.DoesNotExist:
+                messages.error(request, "No user found with this email address.")
+        else:
+            for field in form:
+                for error in field.errors:
+                    messages.error(request, error)
+    return redirect(reverse('board', kwargs={'board_name': board_name}))
 
-            # Perform the task update logic
-            # #Filters through the attributes of the task and updates the description 
-            Task.objects.filter(pk=task_id).update(task_description=new_description)
+#comment
 
-            
-    else:
-        form = EditTaskDescriptionForm()
+@login_required
+def delete_board(request, board_name):
+    board = get_object_or_404(Board, board_name=board_name)
 
-    #renders template, passes form object returns HTTP response
+    # Check if the current user is the author of the board
+    if request.user != board.author:
+        messages.error(request, "You do not have permission to delete this board.")
+        return redirect(reverse('board', kwargs={'board_name': board_name}))
 
-    return render(request, 'change_task_description.html', {'form': form})  
+    # Perform deletion
+    board.delete()
+    messages.success(request, "Board deleted successfully.")
+    return redirect('dashboard')
+
+
+
+
+@login_required
+def remove_member_from_board(request, board_name):
+    current_user = request.user
+    board = get_object_or_404(Board, board_name=board_name)
+    if not board.author == current_user:
+        messages.error(request, "Only the board owner can remove members.")
+        return redirect(reverse('board', kwargs={'board_name': board_name}))
+
+    if request.method == 'POST':
+        form = RemoveMemberForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                user_to_remove = User.objects.get(email=email)
+                if user_to_remove == board.author:
+                    messages.error(request, "You cannot remove yourself from the board.")
+                elif board.team.members.filter(id=user_to_remove.id).exists():
+                    board.team.members.remove(user_to_remove)
+                    messages.success(request, "Member removed successfully.")
+                else:
+                    messages.error(request, "User is not a member of this board.")
+            except User.DoesNotExist:
+                messages.error(request, "No user found with this email address.")
+        else:
+            for field in form:
+                for error in field.errors:
+                    messages.error(request, error)
+    return redirect(reverse('board', kwargs={'board_name': board_name}))
+
+
+@login_required
+def delete_board(request, board_name):
+    board = get_object_or_404(Board, board_name=board_name)
+
+    # Check if the current user is the author of the board
+    if request.user != board.author:
+        messages.error(request, "You do not have permission to delete this board.")
+        return redirect(reverse('board', kwargs={'board_name': board_name}))
+
+    # Perform deletion
+    board.delete()
+    messages.success(request, "Board deleted successfully.")
+    return redirect('dashboard')
+
+
+
 
 
 #def assign_tasks(request):

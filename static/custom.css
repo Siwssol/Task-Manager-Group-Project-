@@ -153,3 +153,70 @@ h3.profile-title {
 }
 
 
+
+/*
+Drop down menu for the menu button
+*/
+
+/* Custom CSS for Navbar Dropdown */
+.navbar .dropdown-menu {
+  margin-top: 0; 
+}
+
+
+.navbar .nav-link.dropdown-toggle {
+  cursor: pointer; 
+}
+
+.navbar .dropdown-item:hover {
+  background-color: #f8f9fa; 
+  color: #007bff; 
+}
+
+/* Custom CSS for Navbar Dropdown with Checkboxes */
+.navbar .dropdown-menu .form-check {
+  padding: 0.5rem 1rem; /* Adjust padding for each item */
+  display: flex;
+  align-items: center;
+}
+
+.navbar .dropdown-menu .form-check-input {
+  margin-right: 0.5rem; /* Space between checkbox and label */
+}
+
+.navbar .dropdown-menu .form-check-label {
+  margin-bottom: 0; /* Remove default bottom margin */
+}
+
+/*
+Adding and removing members button from navbar
+*/
+.dropdown-hover {
+  position: relative;
+}
+
+.dropdown-hover-content {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background-color: #f9f9f9;
+  min-width: 180px; 
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-hover:hover .dropdown-hover-content {
+  display: block;
+}
+
+.dropdown-hover-content .form-control,
+.dropdown-hover-content .btn {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding: 5px;
+  width: 100%; 
+  border-radius: 15px;
+}
+
+
