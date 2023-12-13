@@ -122,10 +122,19 @@ class Board(models.Model):
 
 """Each task will be stored in a certain list, so we need to keep track on which list the task is in"""
 class TaskList(models.Model):
+
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
     listName = models.CharField(max_length=50, blank=False)
 
 class Task(models.Model):
+    """Priority system"""
+    class Priority(models.TextChoices):
+        NONE = "NONE"
+        LOW = "LOW"
+        MID = "MID"
+        HIGH = "HIGH"
+    class Meta:
+        ordering = ["due_date"]
 
     """Model used for creating tasks, with attached parameters."""
     # Links the task model to the list
@@ -136,4 +145,6 @@ class Task(models.Model):
     task_description = models.TextField(max_length=1000)
     #Defines the due Date
     due_date = models.DateTimeField()
+    #Defines priority
+    task_priority = models.TextField(choices=Priority.choices, default=Priority.NONE)
 

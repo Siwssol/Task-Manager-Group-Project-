@@ -14,10 +14,9 @@ from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoa
 from tasks.helpers import login_prohibited
 from .models import Board, TaskList
 from tasks.models import Board, TaskList, User, Teams, Task, TeamMembershipStatus
-
-#
 from tasks.forms import AddMemberForm
 from tasks.forms import RemoveMemberForm
+
 
 @login_required
 def dashboard(request):
@@ -183,9 +182,17 @@ def updateTaskLocation(request, taskID, board_name):
         task.list_id = list
         task.save()
 
-        boardName = Task.objects.get(id=taskID).list.board.board_name
         # Redirect back to the page or wherever you want
-        return HttpResponseRedirect(reverse('board', args=[boardName]))
+        return HttpResponseRedirect(reverse('board', args=[board_name]))
+
+def updateTaskPriority(request, taskID, board_name):
+    if request.method == 'POST':
+        new_priority = request.POST.get('new_priority')
+        task = Task.objects.get(id=taskID)
+        task.task_priority = new_priority
+        task.save()
+
+        return HttpResponseRedirect(reverse('board', args=[board_name]))
 
 @login_required
 def board(request, board_name):
@@ -387,6 +394,7 @@ def add_member_to_board(request, board_name):
                     messages.error(request, error)
     # In your add_member_to_board view
     return redirect(reverse('board', kwargs={'board_name': board_name}))
+
 
 
 
