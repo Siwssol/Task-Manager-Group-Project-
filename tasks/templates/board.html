@@ -397,7 +397,6 @@
                     <label class="TaskListName">{{ list.listName }}</label>
                     {% for task in tasks %}
                         {% if task.list_id == list.id %}
-
                             {% if task.task_priority == "NONE" %}
                                 <div class="panel panel-default TaskContainer">
                             {% elif task.task_priority == "LOW" %}

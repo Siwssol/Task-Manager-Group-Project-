@@ -283,6 +283,7 @@ class CreateTaskForm(forms.ModelForm):
         task.save()
         return task
 
+
 class AddMemberForm(forms.Form):
     email = forms.EmailField(label='Member Email')
 
@@ -306,10 +307,12 @@ class AddMemberForm(forms.Form):
 
         return email
 
+
 #forms for checkbox -> remove member 
 
 class RemoveMemberForm(forms.Form):
     email = forms.EmailField(label='Member Email')
+
 
     def email_exist_in_database(self, email):
         """Check if the email exists in the User model."""
@@ -332,21 +335,4 @@ class RemoveMemberForm(forms.Form):
         return email
 
 
-    
-# class AssignTasksForm(forms.Form):
-#     available_members = forms.ModelMultipleChoiceField(
-#         queryset=Teams.team_members.all(),
-#         #Teams.objects.all()
-#         widget = forms.CheckboxSelectMultiple
 
-#     )
-
-    """
-class AssignTasksForm(forms.Form):
-    available_members = forms.ModelMultipleChoiceField(
-        queryset=Teams.team_members.all(),
-        #Teams.objects.all()
-        widget = forms.CheckboxSelectMultiple
-
-    )
-"""
