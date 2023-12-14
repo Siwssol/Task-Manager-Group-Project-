@@ -41,7 +41,6 @@ class User(AbstractUser):
     def mini_gravatar(self):
         """Return a URL to a miniature version of the user's gravatar."""
 
-
         return self.gravatar(size=60)
 
 
@@ -99,11 +98,8 @@ class Board(models.Model):
         self.team.invite_user(name, perm)
 
     def remove_member(self, requesting_user, user_to_remove):
-        # Check if the requesting user is the board owner
         if self.author != requesting_user:
             raise PermissionError("Only the board owner can remove members.")
-
-        # Check if the user to be removed is in the team associated with the board
         if self.team.members.filter(id=user_to_remove.id).exists():
             self.team.members.remove(user_to_remove)
         else:
@@ -141,4 +137,5 @@ class Task(models.Model):
     due_date = models.DateTimeField()
     #Defines priority
     task_priority = models.TextField(choices=Priority.choices, default=Priority.NONE)
-
+    #Defines assigned members
+    assigned_members = models.ManyToManyField(User)

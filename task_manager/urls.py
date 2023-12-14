@@ -37,7 +37,9 @@ urlpatterns = [
     path('board/<str:board_name>/remove_member/', views.remove_member_from_board, name='remove_member_from_board'),
     path('delete_board/<str:board_name>/', views.delete_board, name='delete_board'),
     path('updateTaskLocation/<int:taskID>/<str:board_name>', views.updateTaskLocation, name='updateTaskLocation'),
-    path('updateTaskPriority/<int:taskID>/<str:board_name>', views.updateTaskPriority, name='updateTaskPriority')
+    path('updateTaskPriority/<int:taskID>/<str:board_name>', views.updateTaskPriority, name='updateTaskPriority'),
+    path('assign_tasks/<int:taskID>/<str:board_name>/', views.assign_tasks_view, name='assign_tasks_view')
+
 
 ]
 
