@@ -1,12 +1,30 @@
 <!DOCTYPE html>
 {% extends 'base_content.html' %}
 {% block content %}
+    <style>
+    body {
+        background-image: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
+        background-size: 200% 200%;
+	    animation: gradient 15s ease infinite;
+    }
+    @keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+</style>
 <html lang="en">
 <body>
 <div class="container">
   <div class="row">
     <div class="col-sm-12 col-md-6 offset-md-3">
-        <h1>CREATE A NEW TASK NOW!!! </h1>
+        <h1>CREATE A NEW TASK NOW</h1>
         <form action="{% url 'createTask' taskListID=request.resolver_match.kwargs.taskListID board_name=request.resolver_match.kwargs.board_name %}" method="post">
             <input type="hidden" name="next" value="{{ next }}">
             {% csrf_token %}

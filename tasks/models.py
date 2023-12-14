@@ -96,8 +96,7 @@ class Board(models.Model):
 
     def invite(self , name, perm):
         self.team.invite_user(name, perm)
-        
-        
+
     def remove_member(self, requesting_user, user_to_remove):
         if self.author != requesting_user:
             raise PermissionError("Only the board owner can remove members.")
@@ -138,4 +137,5 @@ class Task(models.Model):
     due_date = models.DateTimeField()
     #Defines priority
     task_priority = models.TextField(choices=Priority.choices, default=Priority.NONE)
-
+    #Defines assigned members
+    assigned_members = models.ManyToManyField(User)

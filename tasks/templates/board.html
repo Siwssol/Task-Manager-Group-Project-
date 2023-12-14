@@ -57,7 +57,7 @@
     }
 
     .LOW {
-        border-color: green;
+        border-color: rgb(0, 255, 0, 0.35);
         border-style: solid;
         box-shadow: 0px 5px 15px 0px rgba(0, 255, 0, 0.35);
     }
@@ -77,7 +77,7 @@
     .collapsing {
         height: 0;
         overflow: hidden;
-        transition: height 0.15s ease-in-out;
+        transition: height 0.3s ease-in-out;
     }
 
     .taskDetails, .taskDesc {
@@ -472,12 +472,33 @@
                                 <div id="taskDetails{{ task.id }}" class="collapse taskDetails" >
                                     <div class="panel-body">
                                         <p class="taskDesc">{{ task.task_description }}</p>
+                                        {% if task.assigned_members.all %}
+                                            <table class="assignedUsers">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            Assigned Members
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for member in task.assigned_members.all %}
+                                                        <tr>
+                                                            <td> {{ member.username }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        {% endif %}
                                         <p class="dueDate">{{ task.due_date }}</p>
                                         <a class="EditTaskNameLink" href="{% url 'change_task_name' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
                                             <button type="button" class="EditTaskNameButton">Edit Name</button>
                                         </a>
                                         <a class="EditTaskDescLink" href="{% url 'change_task_description' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
                                             <button type="button" class="EditTaskDescButton">Edit Description</button>
+                                        </a>
+                                        <a class="SelectUser" href="{% url 'assign_tasks_view' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                            <button type="button" class="SelectUserButton">Assign Users</button>
                                         </a>
                                         <button class="TaskPriorityChange" type="button" data-bs-toggle="dropdown">Change Priority</button>
                                         <ul class="PriorityOptions dropdown-menu">
