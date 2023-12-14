@@ -41,7 +41,6 @@ class User(AbstractUser):
     def mini_gravatar(self):
         """Return a URL to a miniature version of the user's gravatar."""
 
-
         return self.gravatar(size=60)
 
 
@@ -87,12 +86,21 @@ class Board(models.Model):
                                   )
     team = models.OneToOneField(Teams,on_delete = models.CASCADE)
     
+    def initialiseteam(self):
+        team_users = self.team_emails.split(',')
+        for email in team_users:
+            usernames = email.split('@')
+            username = '@' + usernames[0]
+            self.team.add_user(username)
+    
+
+    def invite(self , name, perm):
+        self.team.invite_user(name, perm)
+        
+        
     def remove_member(self, requesting_user, user_to_remove):
-        # Check if the requesting user is the board owner
         if self.author != requesting_user:
             raise PermissionError("Only the board owner can remove members.")
-
-        # Check if the user to be removed is in the team associated with the board
         if self.team.members.filter(id=user_to_remove.id).exists():
             self.team.members.remove(user_to_remove)
         else:
@@ -105,10 +113,19 @@ class Board(models.Model):
 
 """Each task will be stored in a certain list, so we need to keep track on which list the task is in"""
 class TaskList(models.Model):
+
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
     listName = models.CharField(max_length=50, blank=False)
 
 class Task(models.Model):
+    """Priority system"""
+    class Priority(models.TextChoices):
+        NONE = "NONE"
+        LOW = "LOW"
+        MID = "MID"
+        HIGH = "HIGH"
+    class Meta:
+        ordering = ["due_date"]
 
     """Model used for creating tasks, with attached parameters."""
     # Links the task model to the list

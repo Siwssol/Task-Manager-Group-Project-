@@ -1,7 +1,16 @@
+<style>
+    .navIcon {
+        width: 50px;
+        height: 50px;
+    }
+</style>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
   <div class="container">
     <a class="navbar-brand" href="{% url 'dashboard' %}">
-      <span class="img"></span>&nbsp;Lynx
+      <span class="img" >
+          <img class="navIcon" src="https://cdn.discordapp.com/attachments/657968259982819350/1184473639593189397/JjRGQQMAgYBg0BKETAEmtKJMcMyCBgEDAIGgXQj8P8BBfV5qicB1h0AAAAASUVORK5CYII.png?ex=658c1a0a&is=6579a50a&hm=1fddddc8881f2643fa94b95505afc55c5ea47f9097295404b712fdb54964dbcd&">
+      </span>&nbsp;Lynx
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -11,3 +20,5 @@
     {% endif %}
   </div>
 </nav>
+
+
