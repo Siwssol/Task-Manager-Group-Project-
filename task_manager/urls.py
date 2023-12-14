@@ -40,6 +40,7 @@ urlpatterns = [
     path('updateTaskPriority/<int:taskID>/<str:board_name>', views.updateTaskPriority, name='updateTaskPriority'),
     path('assign_tasks/<int:taskID>/<str:board_name>/', views.assign_tasks_view, name='assign_tasks_view')
 
+
 ]
 
 

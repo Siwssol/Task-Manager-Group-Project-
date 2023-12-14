@@ -96,8 +96,7 @@ class Board(models.Model):
 
     def invite(self , name, perm):
         self.team.invite_user(name, perm)
-        
-        
+
     def remove_member(self, requesting_user, user_to_remove):
         if self.author != requesting_user:
             raise PermissionError("Only the board owner can remove members.")
