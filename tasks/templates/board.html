@@ -490,7 +490,7 @@
                                                 </tbody>
                                             </table>
                                         {% endif %}
-                                        <p class="dueDate">{{ task.due_date }}</p>
+                                        <p class="dueDate">Due: {{ task.due_date }}</p>
                                         <a class="EditTaskNameLink" href="{% url 'change_task_name' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
                                             <button type="button" class="EditTaskNameButton">Edit Name</button>
                                         </a>
