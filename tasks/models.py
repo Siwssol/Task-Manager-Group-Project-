@@ -119,4 +119,7 @@ class Task(models.Model):
     task_description = models.TextField(max_length=1000)
     #Defines the due Date
     due_date = models.DateTimeField()
-
+    #Defines priority
+    task_priority = models.TextField(choices=Priority.choices, default=Priority.NONE)
+    #Defines assigned members
+    assigned_members = models.ManyToManyField(User)

@@ -10,11 +10,10 @@ from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
-from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm, AssignTasksForm
+from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm, RemoveMemberForm, AddMemberForm, AssignTasksForm
 from tasks.helpers import login_prohibited
-from .forms import EditTaskNameForm, EditTaskDescriptionForm
-from .models import Board, TaskList
 from tasks.models import Board, TaskList, User, Teams, Task, TeamMembershipStatus
+
 
 
 @login_required
@@ -23,8 +22,6 @@ def dashboard(request):
     current_user = request.user
     current_boards = Board.objects.all().filter(team__members = current_user)
     current_boards.distinct()
-    for i in current_boards:
-        print(i)
     return render(request, 'dashboard.html', {'user': current_user, 'boards' : current_boards})
 
 @login_required
@@ -66,7 +63,6 @@ def create_board_view(request):
 
 """Display the Task Creation screen"""
 def createTaskView(request, taskListID, board_name):
-    print(taskListID)
     taskList = TaskList.objects.get(pk = taskListID)
     form = CreateTaskForm()
 
@@ -89,7 +85,6 @@ def createTaskView(request, taskListID, board_name):
             for list in lists:
                 tasks = Task.objects.all().filter(list=list)
                 for task in tasks:
-                    print(task)
                     tasksList.append(task)
 
             """Debugging print statements
@@ -120,7 +115,6 @@ def change_task_name(request, taskID, board_name):
             for list in lists:
                 tasks = Task.objects.all().filter(list=list)
                 for task in tasks:
-                    print(task)
                     tasksList.append(task)
             return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList})
         else:
@@ -146,7 +140,6 @@ def change_task_description(request, taskID, board_name):
             for list in lists:
                 tasks = Task.objects.all().filter(list=list)
                 for task in tasks:
-                    print(task)
                     tasksList.append(task)
             return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList})
         else:
@@ -170,13 +163,9 @@ def achievements(request):
 def updateTaskLocation(request, taskID, board_name):
     if request.method == 'POST':
         new_list = request.POST.get('new_list')
-        print("SOMETHING" ,new_list)
-        print(f"Task ID: {taskID}, New List Name: {new_list}")
 
-        # Your logic to update the task sand move it to the new list goes here
         task = Task.objects.get(id=taskID)
         list = TaskList.objects.get(board=board_name, listName=new_list)
-        print(list)
         task.list_id = list
         task.save()
 
@@ -204,7 +193,6 @@ def board(request, board_name):
             for list in lists:
                 tasks = Task.objects.all().filter(list = list)
                 for task in tasks:
-                    print(task)
                     tasksList.append(task)
             return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level})
         elif 'rejected' in request.POST:
@@ -222,7 +210,6 @@ def board(request, board_name):
         for list in lists:
             tasks = Task.objects.all().filter(list = list)
             for task in tasks:
-                print(task)
                 tasksList.append(task)
 
         return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level})
@@ -449,6 +436,62 @@ def change_task_description(request):
     #return render(request, 'assign_task.html', {'form': form})
 
 
+@login_required
+def assign_tasks_view(request, taskID, board_name):
+    redirect_to_home = False
+    add_more_users = False
+    form = AssignTasksForm()
+    if request.method == 'POST':
+        form = AssignTasksForm(request.POST)
+        if form.is_valid():
+            if 'redirect_to_home' in request.POST:
+                redirect_to_home = True
+            elif 'add_more_users' in request.POST:
+                add_more_users = True
+            if redirect_to_home or add_more_users:
+                user = form.cleaned_data.get('username')
+                user_object = User.objects.get(username = user)
+                team_total = Board.objects.get(board_name = board_name).team
+                team_members = list(team_total.members.all())
+                assigned_members = list(Task.objects.get(pk=taskID).assigned_members.all())
+                if user_object not in team_members or TeamMembershipStatus.objects.get(team=team_total,user= user_object).permission_level == 3:
+                    messages.error(request, f"{user} is not a member of this board's team or is yet to fully join.")
+                elif user_object in assigned_members:
+                    messages.error(request,f"{user} is already assigned to this task.")
+                else:
+                    task = Task.objects.get(pk=taskID)
+                    task.assigned_members.add(user_object)
+                    task.save()
+                    if redirect_to_home:
+                        return redirect('/boards/' + board_name)  
+                    if add_more_users:
+                        return redirect('/assign_tasks/' + str(taskID) + "/" + board_name)
+        else:
+            context = generate_context(form,board_name,taskID)
+            return render(request, 'assign_tasks.html', context)
+                   
+    context = generate_context(form,board_name,taskID)
+    return render(request, 'assign_tasks.html', context)
 
+def generate_context(form, board_name,taskID,error_msg = None):
+    current_board = Board.objects.get(board_name=board_name)
+    current_members_manager = TeamMembershipStatus.objects.filter(team=current_board.team)
+    members = []
+    membership_type = []
+    for member in current_members_manager:
+        members.append(member.user.username)
+        if member.permission_level != 3:
+            membership_type.append("Member")
+        else:
+            membership_type.append("Not yet joined")
+    members_and_types = zip(members,membership_type)
+    context = {
+        'form' : form,
+        'taskID': taskID,
+        'board_name': board_name,
+        'options': members_and_types,
+        'error' : error_msg
+    }
+    return context
 
 

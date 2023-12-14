@@ -222,10 +222,8 @@ class CreateBoardForm(forms.ModelForm):
             return False
     
     def checkBoardType(self,board_type_to_analyse):
-        if (board_type_to_analyse == "INVALID"):
-            return True
-        else:
-            return False
+        return (board_type_to_analyse == "INVALID")
+
 
     def checkEmails(self,team_emails_to_analyse,board_type_to_analyse):
         if (board_type_to_analyse == 'Private'):
@@ -239,8 +237,6 @@ class CreateBoardForm(forms.ModelForm):
                 return True
             else:
                 return self.emails_exist_in_database()
-        return False
-
 
     def save(self):
         """ Create new board"""
@@ -284,10 +280,84 @@ class CreateTaskForm(forms.ModelForm):
         )
         task.save()
         return task
-class AssignTasksForm(forms.Form):
-    available_members = forms.ModelMultipleChoiceField(
-        queryset=Teams.team_members.all(),
-        #Teams.objects.all()
-        widget = forms.CheckboxSelectMultiple
 
-    )
+class AddMemberForm(forms.Form):
+    
+    email = forms.EmailField(label='Member Email')
+
+    def email_exist_in_database(self, email):
+        """Check if the email exists in the User model."""
+        try:
+            User.objects.get(email=email)
+            return True
+        except User.DoesNotExist:
+            return False
+
+    def clean_email(self):
+        """Clean and validate the email field."""
+        email = self.cleaned_data.get('email')
+
+        if not email:
+            raise ValidationError("Email field cannot be blank.")
+
+        if not self.email_exist_in_database(email):
+            raise ValidationError("No user found with this email address.")
+
+        return email
+
+
+class RemoveMemberForm(forms.Form):
+    
+    email = forms.EmailField(label='Member Email')
+    
+    def email_exist_in_database(self, email):
+        """Check if the email exists in the User model."""
+        try:
+            User.objects.get(email=email)
+            return True
+        except User.DoesNotExist:
+            return False
+
+    def clean_email(self):
+        """Clean and validate the email field."""
+        email = self.cleaned_data.get('email')
+
+        if not email:
+            raise ValidationError("Email field cannot be blank.")
+
+        if not self.email_exist_in_database(email):
+            raise ValidationError("No user found with this email address.")
+
+        return email
+
+class AssignTasksForm(forms.Form):
+    username = forms.CharField(label="Enter Username Here",
+            validators=[RegexValidator(
+            regex=r'^@\w{3,}$',
+            message='Username must consist of @ followed by at least three alphanumericals'
+            )])
+
+    def check_user_exists(self,username):
+        try:
+            User.objects.get(username = username)
+        except User.DoesNotExist:
+            return False
+        return True
+        
+    
+    def clean(self):
+        """Clean the data inputted by the user and generate a response if there are any errors."""
+
+        super().clean()
+
+        user = self.cleaned_data.get('username')
+        username_result = self.check_username(user)
+        if (username_result):
+            self.add_error('username','Inputted username is not valid')
+        elif not self.check_user_exists(user):
+            self.add_error('username','Username does not exist')
+    
+
+    def check_username(self,username):
+        return username is None
+

@@ -437,12 +437,70 @@
                                 <div id="taskDetails{{ task.id }}" class="collapse taskDetails" >
                                     <div class="panel-body">
                                         <p class="taskDesc">{{ task.task_description }}</p>
+                                        {% if task.assigned_members.all %}
+                                            <table class="assignedUsers">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            Assigned Members
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for member in task.assigned_members.all %}
+                                                        <tr>
+                                                            <td> {{ member.username }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        {% endif %}
+                                        <p class="dueDate">{{ task.due_date }}</p>
                                         <a class="EditTaskNameLink" href="{% url 'change_task_name' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
                                             <button type="button" class="EditTaskNameButton">Edit Name</button>
                                         </a>
                                         <a class="EditTaskDescLink" href="{% url 'change_task_description' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
                                             <button type="button" class="EditTaskDescButton">Edit Description</button>
                                         </a>
+                                        <a class="SelectUser" href="{% url 'assign_tasks_view' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                            <button type="button" class="SelectUserButton">Assign Users</button>
+                                        </a>
+                                        <button class="TaskPriorityChange" type="button" data-bs-toggle="dropdown">Change Priority</button>
+                                        <ul class="PriorityOptions dropdown-menu">
+                                            <li>
+                                                 <form method="post" action="{% url 'updateTaskPriority' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                 {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_priority" value="NONE">
+                                                    <button class="test" type="submit">NONE</button>
+                                                 </form>
+                                            </li>
+                                            <li>
+                                                 <form method="post" action="{% url 'updateTaskPriority' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                 {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_priority" value="LOW">
+                                                    <button class="test" type="submit">LOW</button>
+                                                 </form>
+                                            </li>
+                                            <li>
+                                                 <form method="post" action="{% url 'updateTaskPriority' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                 {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_priority" value="MID">
+                                                    <button class="test" type="submit">MID</button>
+                                                 </form>
+                                            </li>
+                                            <li>
+                                                 <form method="post" action="{% url 'updateTaskPriority' taskID=task.id board_name=request.resolver_match.kwargs.board_name %}">
+                                                 {% csrf_token %}
+                                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                                    <input type="hidden" name="new_priority" value="HIGH">
+                                                    <button class="test" type="submit">HIGH</button>
+                                                 </form>
+                                            </li>
+                                        </ul>
+
 
                                     </div>
                                 </div>
