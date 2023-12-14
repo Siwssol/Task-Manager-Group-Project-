@@ -1,14 +1,287 @@
 <!DOCTYPE html>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .backgroundCont {
+        z-index: -1;
+        margin: 0;
+        position: absolute;
+        background-size: cover;
+        top: -100px;
+    }
+
+    .background {
+        width: 100%;
+        height: 100%;
+    }
+
+    .container {
+        position: relative;
+    }
+
+    .formContainer {
+        z-index: 1;
+        position: relative;
+        width: 400px;
+        max-width: min-content;
+        height: min-content;
+        background-color: transparent;
+        backdrop-filter: blur(8px);
+        border-radius: 20px;
+        left: 36%;
+        top: 100px;
+        box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.35);
+    }
+
+    .formNameCont, .EnterNameCont , .inputCont{
+        padding: 10px;
+        justify-content: center;
+        display: flex;
+    }
+
+    .inputName {
+        font-size: 30px;
+        padding: 10px;
+    }
+
+    .inputCont {
+        width: max-content;
+        height: min-content;
+    }
+
+    .inputBox {
+        height: min-content;
+        width: 150px;
+        position: relative;
+        top: 14px;
+        font-size: 20px;
+    }
+
+    .buttonCont {
+        padding: 5px;
+        position: relative;
+    }
+
+    .submitBut {
+        position: relative;
+        left: 30%;
+        padding: 10px;
+        border-radius: 12px;
+        box-shadow: 0px 5px 15px 0px rgba(255, 255, 255, 0.35);
+        border: 1px solid rgba(0,0,0,0);
+        cursor: pointer;
+        transition: transform 0.5s;
+        background: #e3edf7;
+    }
+
+    .submitBut:hover {
+    border: 1px solid rgba(0,0,0,0.1);
+    transform: translateY(0.5em);
+    }
+
+    .submitBut svg {
+    transition: transform 0.5s;
+    }
+
+    .submitBut:hover svg {
+    transform: scale(0.9);
+    fill: #333333;
+    }
+
+    .formName {
+        font-size: 35px;
+        position: relative;
+        padding: 5px;
+        margin: 0;
+        background-color: black;
+        transition: width 0.5s ease, height 0.5s ease, border-radius 0.3s ease;
+        justify-content: center;
+        color: white;
+        display: flex;
+        width: 300px;
+        height: 40px;
+        border-radius: 20px;
+    }
+
+    .formName:hover {
+        width: 350px;
+        height: 200px;
+        border-radius: 50px;
+        transition-duration: .3s;
+    }
+
+    .formName:hover .meow {
+        transform: translateX(300px);
+        font-size: 30px;
+        opacity: 0;
+        color: white;
+        transition-duration: 5s;
+        transition: transform 1.5s ease, opacity 1.5s ease;
+
+    }
+    .formName:hover .meow1 {
+        transform: translateX(260px);
+        font-size: 30px;
+        opacity: 0;
+        color: white;
+        transition-duration: 5s;
+        transition: transform 2s ease, opacity 1.5s ease;
+
+    }
+
+    .formName:hover .meow2 {
+        transform: translateX(260px);
+        font-size: 30px;
+        opacity: 0;
+        color: white;
+        transition-duration: 5s;
+        transition: transform 2s ease, opacity 2s ease;
+
+    }
+    .formName:hover .meow3 {
+        transform: translateX(220px);
+        font-size: 30px;
+        opacity: 0;
+        color: white;
+        transition-duration: 5s;
+        transition: transform 0.5s ease, opacity 2s ease;
+
+    }
+    .formName:hover .meow4 {
+        transform: translateX(300px);
+        font-size: 30px;
+        opacity: 0;
+        color: white;
+        transition-duration: 5s;
+        transition: transform 1s ease, opacity 2s ease;
+
+    }
+
+    .formName:hover .meow5 {
+        transform: translateX(100px);
+        font-size: 30px;
+        opacity: 0;
+        color: white;
+        transition-duration: 5s;
+        transition: transform 1.3s ease, opacity 2s ease;
+
+    }
+
+    .meow {
+        color: transparent;
+        position: absolute;
+        font-size: 1px;
+        transition: transform 1.5s ease, opacity 1.5s ease;
+        z-index: 5;
+        left: -50px;
+        top: 100px;
+    }
+
+    .meow1 {
+        color: transparent;
+        position: absolute;
+        font-size: 1px;
+        transition: transform 1.5s ease, opacity 1.5s ease;
+        z-index: 5;
+        left: -30px;
+        top: 50px;
+    }
+
+    .meow2 {
+        color: transparent;
+        position: absolute;
+        font-size: 1px;
+        transition: transform 1.5s ease, opacity 1.5s ease;
+        z-index: 5;
+        left: -60px;
+        top: 120px;
+    }
+
+    .meow3 {
+        color: transparent;
+        position: absolute;
+        font-size: 1px;
+        transition: transform 1.5s ease, opacity 1.5s ease;
+        z-index: 5;
+        left: -50px;
+        top: 160px;
+    }
+
+    .meow4 {
+        color: transparent;
+        position: absolute;
+        font-size: 1px;
+        transition: transform 1.5s ease, opacity 1.5s ease;
+        z-index: 5;
+        left: -10px;
+        top: 140px;
+    }
+
+    .meow5 {
+        color: transparent;
+        position: absolute;
+        font-size: 1px;
+        transition: transform 1.5s ease, opacity 1.5s ease;
+        z-index: 5;
+        left: -50px;
+        top: 35px;
+    }
+
+    .meow::before {
+        color: transparent;
+        font-size: 1px;
+        transition-duration: 0.4s;
+
+    }
+
+    .formName:hover::before {
+        opacity: 1;
+        transition-duration: 1s;
+    }
+
+
+    .EnterNameCont {
+        position: relative;
+    }
+
+
+</style>
 <html>
 <head>
     <title>Change Task Name</title>
 </head>
 <body>
-    <h2>Change Task Name</h2>
-    <form method="post" action="{% url 'change_task_name' taskID=request.resolver_match.kwargs.taskID board_name=request.resolver_match.kwargs.board_name  %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Change Task Name</button>
-    </form>
+    <div class="backgroundCont">
+        <img class="background" src="https://static.nationalgeographic.co.uk/files/styles/image_3200/public/lynx-mather-02a.jpg?w=1600">
+    </div>
+    <div class="formContainer">
+        <div class="container">
+            <label class="formNameCont">
+                <h2 class="formName">Change Task Name
+                    <label class="meow">MEOW</label>
+                    <label class="meow1">MEOW</label>
+                    <label class="meow2">MEOWW</label>
+                    <label class="meow3">MEOW</label>
+                    <label class="meow4">MEOWW</label>
+                    <label class="meow5">MEOW</label>
+                </h2>
+            </label>
+        </div>
+    <div class="EnterNameCont">
+        <form method="post" action="{% url 'change_task_name' taskID=request.resolver_match.kwargs.taskID board_name=request.resolver_match.kwargs.board_name  %}">
+            {% csrf_token %}
+            <div class="inputCont">
+                <label class="inputName">New Name</label>
+                <input class="inputBox" type="text" name="new_name">{{ new_name }}
+            </div>
+            <div class="buttonCont">
+                <button class="submitBut" type="submit">Change Task Name</button>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>
