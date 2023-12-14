@@ -41,6 +41,39 @@ class BoardModelTestCase(TestCase):
         pass
 
 
+    def test_initialiseteam_method(self):
+        self.board.initialiseteam()
+
+        self.assertEqual(self.board.team.members.count(), 2)
+        self.assertTrue(self.board.team.members.filter(username='@test1').exists())
+        self.assertTrue(self.board.team.members.filter(username='@test2').exists())
+
+    def test_remove_member_method(self):
+        self.board.initialiseteam()
+
+        user_to_remove = self.board.team.members.first()
+        self.board.remove_member(self.user, user_to_remove)
+
+        self.assertEqual(self.board.team.members.count(), 1)
+        self.assertFalse(self.board.team.members.filter(username='@test1').exists())
+        self.assertTrue(self.board.team.members.filter(username='@test2').exists())
+
+    def test_remove_member_method_permission_error(self):
+        self.board.initialiseteam()
+
+        # Create another user
+        other_user = User.objects.create_user(username='otheruser', password='otherpassword', email='other@example.com')
+
+        user_to_remove = self.board.team.members.first()
+        with self.assertRaises(PermissionError):
+            self.board.remove_member(other_user, user_to_remove)
+
+    def test_remove_member_method_value_error(self):
+        other_user = User.objects.create_user(username='otheruser', password='otherpassword', email='other@example.com')
+        with self.assertRaises(ValueError):
+            self.board.remove_member(self.user, other_user)
+
+
     """ THESE TESTS WILL BE NECESSARY FOR TESTING NEW BOARDS APPEARING AND NOT APPEARING"""
     # def test_create_new_board_url(self):
     #     self.assertEqual(self.url, '/create_board/')
