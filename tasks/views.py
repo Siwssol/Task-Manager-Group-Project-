@@ -73,34 +73,20 @@ def createTaskView(request, taskListID, board_name):
     taskList = TaskList.objects.get(pk = taskListID)
     form = CreateTaskForm()
 
-    print(request.method)
-    # TEMP COMMENT
-    # TEMP COMMENT 2
     if request.method == 'POST':
-        current_user = request.user
         form = CreateTaskForm(request.POST)
-        # print("Have entered this if statement")
         if form.is_valid():
-            #print("Task created")
             task_name = form.cleaned_data.get('task_name')
             task_description = form.cleaned_data.get('task_description')
             due_date = form.cleaned_data.get('due_date')
             lists = TaskList.objects.all().filter(board=board_name)
             task = Task.objects.create(list = taskList, task_name = task_name, task_description = task_description, due_date = due_date)
-            #print(task.task_name, task.task_description)
             tasksList = []
             for list in lists:
                 tasks = Task.objects.all().filter(list=list)
                 for task in tasks:
                     print(task)
                     tasksList.append(task)
-
-            """Debugging print statements
-            for task in tasks:
-                print(task.task_name)
-            for list in lists:
-                print(list)
-            """
             return redirect('/boards/' + board_name)
         else:
             return render(request, 'createTask.html', {'form': form})
@@ -111,7 +97,6 @@ def createTaskView(request, taskListID, board_name):
 def change_task_name(request, taskID, board_name):
     task = get_object_or_404(Task, id=taskID)
     if request.method == 'POST':
-        current_user = request.user
         form = EditTaskNameForm(request.POST, instance=task, initial={'board_name': board_name})
         if form.is_valid():
             # Process the form data
@@ -133,11 +118,11 @@ def change_task_name(request, taskID, board_name):
         form = EditTaskNameForm(instance=task, initial={'board_name': board_name})
     return render(request, 'change_task_name.html', {'form': form})
 
+
 @login_required
 def change_task_description(request, taskID, board_name):
     task = get_object_or_404(Task, id=taskID)
     if request.method == 'POST':
-        current_user = request.user
         form = EditTaskDescriptionForm(request.POST, instance=task, initial={'board_name': board_name})
         if form.is_valid():
             # Process the form data
@@ -154,7 +139,6 @@ def change_task_description(request, taskID, board_name):
             return redirect('/boards/' + board_name)
         else:
             return render(request, 'change_task_description.html', {'form': form})
-
     else:
         form = EditTaskDescriptionForm(instance=task, initial={'board_name': board_name})
     return render(request, 'change_task_description.html', {'form': form})
@@ -201,15 +185,9 @@ def board(request, board_name):
     current_user = request.user
     current_board = Board.objects.get(board_name = board_name)
     current_team = current_board.team    
-    
-    #changed
     board_members = current_board.team.members.all()
-
-    ###
-    
+ 
     if request.method == 'POST':
-        # check if board overlay was interacted with or not
-        # CODE NEEDS TO BE REFACTORED HERE DUE TO DUPLICATION
         if 'accepted' in request.POST:
             # Change user membership level and let them access board normally.
             team_membership_obj = TeamMembershipStatus.objects.get(team = current_team, user = current_user)
@@ -243,6 +221,8 @@ def board(request, board_name):
                 tasksList.append(task)
 
         return render(request, 'board.html', {'user': current_user, 'lists': lists, 'tasks': tasksList,'permission_level':member_status.permission_level, "board_name":board_name, "board_members": board_members})
+    
+    
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -353,8 +333,6 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 
-
-
 class SignUpView(LoginProhibitedMixin, FormView):
     """Display the sign up screen and handle sign ups."""
 
@@ -426,7 +404,6 @@ def remove_member_from_board(request, board_name):
                     messages.error(request, error)
     return redirect(reverse('board', kwargs={'board_name': board_name}))
 
-#comment
 
 @login_required
 def delete_board(request, board_name):
@@ -441,8 +418,6 @@ def delete_board(request, board_name):
     board.delete()
     messages.success(request, "Board deleted successfully.")
     return redirect('dashboard')
-
-
 
 
 @login_required
@@ -478,32 +453,13 @@ def remove_member_from_board(request, board_name):
 @login_required
 def delete_board(request, board_name):
     board = get_object_or_404(Board, board_name=board_name)
-
-    # Check if the current user is the author of the board
     if request.user != board.author:
         messages.error(request, "You do not have permission to delete this board.")
         return redirect(reverse('board', kwargs={'board_name': board_name}))
-
-    # Perform deletion
+    
     board.delete()
     messages.success(request, "Board deleted successfully.")
     return redirect('dashboard')
-
-
-
-
-
-#def assign_tasks(request):
-    #if request.method == 'POST':
-        #form = AssignTasksForm(request.POST)
-        #if form.is_valid():
-            #selected_team_members = form.cleaned_data['team_members']
-            #return render(request, 'task_assigned.html', {'selected_team_members': selected_team_members})
-    #else:
-        #form = TaskAssignmentForm()
-
-    #return render(request, 'assign_task.html', {'form': form})
-
 
 
 
