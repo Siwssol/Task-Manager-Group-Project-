@@ -25,9 +25,9 @@ class RemoveMemberFormTest(TestCase):
 
     def test_clean_email_method(self):
         form = RemoveMemberForm()
-        form.cleaned_data = {'email': 'test@example.com'}
-        cleaned_email = form.clean_email()
-        self.assertEqual(cleaned_email, 'test@example.com')
+        form.cleaned_data = {'email': 'Johndoe@example.org'}
+        cleaned_email = form.clean()
+        self.assertEqual(cleaned_email, 'johndoe@example.org')
 
     def test_email_exist_in_database_method(self):
         form = RemoveMemberForm()

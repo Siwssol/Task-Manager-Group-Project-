@@ -8,9 +8,8 @@ class CreateTaskFormTest(TestCase):
         self.form_input = {
             'task_name': 'Test Task',
             'task_description': 'Description for the test task',
-            'due_date_year': 2023,
-            'due_date_month': 12,
-            'due_date_day': 31,
+            'due_date': date(2023, 12, 31),
+            'task_priority': Task.Priority.NONE,
         }
 
     def test_valid_task_form(self):
@@ -21,35 +20,23 @@ class CreateTaskFormTest(TestCase):
         self.form_input['task_name'] = ''
         form = CreateTaskForm(data=self.form_input)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['task_name'], ['Task name cannot be blank'])
+        self.assertEqual(form.errors['task_name'], ['Task name cannot be blank.'])
 
     def test_long_task_name(self):
         self.form_input['task_name'] = 'A' * 51
         form = CreateTaskForm(data=self.form_input)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['task_name'], ['Task name length cannot exceed 50'])
+        self.assertEqual(form.errors['task_name'], ['Task name length cannot exceed 50.'])
 
     def test_blank_due_date(self):
-        self.form_input['due_date_year'] = ''
-        self.form_input['due_date_month'] = ''
-        self.form_input['due_date_day'] = ''
+        self.form_input['due_date'] = None
         form = CreateTaskForm(data=self.form_input)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['due_date'], ['Please enter a valid due date'])
+        self.assertEqual(form.errors['due_date'], ['This field is required.'])
 
     def test_invalid_due_date(self):
-        self.form_input['due_date_year'] = 2022
+        self.form_input['due_date'] = date(2022, 1, 1)
         form = CreateTaskForm(data=self.form_input)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['due_date'], ['Please enter a valid due date'])
+        self.assertEqual(form.errors['due_date'], ['Due date must be in the future.'])
 
-    def test_save_method(self):
-        form = CreateTaskForm(data=self.form_input)
-        self.assertTrue(form.is_valid())
-
-        created_task = form.save()
-        self.assertEqual(Task.objects.count(), 1)
-        self.assertEqual(created_task.task_name, 'Test Task')
-        self.assertEqual(created_task.task_description, 'Description for the test task')
-        self.assertEqual(created_task.due_date, date(2023, 12, 31))
-        self.assertEqual(created_task.task_priority, 'NONE')

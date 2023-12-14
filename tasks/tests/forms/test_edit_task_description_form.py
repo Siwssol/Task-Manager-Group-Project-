@@ -1,49 +1,65 @@
 from tasks.forms import EditTaskDescriptionForm
-from tasks.models import Task
+from tasks.models import Task, TaskList, Board, Teams
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from datetime import datetime
 
 class EditTaskDescriptionFormTest(TestCase):
+
     def setUp(self):
+        self.board = Board.objects.create(
+        author_id=1,
+        board_name='Test Board',
+        board_type='Team',
+        team_emails='test1@example.com,test2@example.com'
+        )
+
+        self.task_list = TaskList.objects.create(
+        board=self.board,
+        listName='Test List'
+        )
+
         self.task = Task.objects.create(
-            task_name='Test Task',
-            task_description='Original description',
-            due_date='2023-12-31'
+        list=self.task_list,
+        task_name='Test Task',
+        task_description='Task Description',
+        due_date=datetime.now(),
+        task_priority=Task.Priority.LOW
         )
 
-        self.form_input = {'new_description': 'Updated description'}
+    def test_valid_edit_task_description_form(self):
+        form_data = {'new_description': 'Updated task description.'}
+        form = EditTaskDescriptionForm(data=form_data, instance=self.task)
 
-    def test_valid_task_description_form(self):
-        form = EditTaskDescriptionForm(instance=self.task, data=self.form_input)
         self.assertTrue(form.is_valid())
+        updated_task = form.save()
 
-    def test_long_task_description(self):
-        self.form_input['new_description'] = 'A' * 1001
-        form = EditTaskDescriptionForm(instance=self.task, data=self.form_input)
+        self.assertEqual(updated_task.task_description, 'Updated task description.')
+        self.assertEqual(Task.objects.get(pk=self.task.pk).task_description, 'Updated task description.')
+
+    def test_empty_new_description(self):
+        form_data = {'new_description': ''}
+        form = EditTaskDescriptionForm(data=form_data, instance=self.task)
+
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['new_description'], ['Task description length cannot exceed 1000'])
+        self.assertEqual(form.errors['new_description'][0], 'This field is required.')
 
-    def test_save_method(self):
-        form = EditTaskDescriptionForm(instance=self.task, data=self.form_input)
+    def test_long_new_description(self):
+        form_data = {'new_description': 'a' * 1001}
+        form = EditTaskDescriptionForm(data=form_data, instance=self.task)
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors['new_description'][0], 'Task description length cannot exceed 1000')
+
+    def test_form_save_commit_true(self):
+        form_data = {'new_description': 'Updated task description.'}
+        form = EditTaskDescriptionForm(data=form_data, instance=self.task)
+
         self.assertTrue(form.is_valid())
-        original_description = self.task.task_description
-        form.save()
-        updated_task = Task.objects.get(pk=self.task.pk)
-        self.assertNotEqual(updated_task.task_description, original_description)
-        self.assertEqual(updated_task.task_description, 'Updated description')
+        updated_task = form.save(commit=True)
 
-    def test_clean_method_long_description(self):
-        task = Task.objects.create(
-            task_name='Test Task',
-            task_description='Original description that is too long' * 50,
-            due_date='2023-12-31'
-        )
-        form_input = {'new_description': 'Updated description that is too long' * 50}
-
-        form = EditTaskDescriptionForm(instance=task, data=form_input)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['new_description'], ['Task description length cannot exceed 1000'])
+        self.assertEqual(updated_task.task_description, 'Updated task description.')
+        self.assertEqual(Task.objects.get(pk=self.task.pk).task_description, 'Updated task description.')
 
 
 
