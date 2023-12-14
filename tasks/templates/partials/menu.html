@@ -8,7 +8,6 @@
                         Menu
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="Menu">
-                        <!-- Display members on the board-->
                         {% if board_members %}
                             {% for member in board_members %}
                                 <li><a class="dropdown-item">{{ member.username }}</a></li>
@@ -28,8 +27,6 @@
                                 </form>
                             </div>
                         </li>
-                        
-                        <!-- Option to Remove Member -->
                         <li class="nav-item dropdown-hover">
                             <a class="dropdown-item" href="#">Remove Member</a>
                             <div class="dropdown-hover-content">
@@ -40,8 +37,6 @@
                                 </form>
                             </div>
                         </li>
-
-                         <!-- Option to Delete Board (Only if current user is the author) -->
                          <li class="nav-item">
                             <a class="dropdown-item" href="{% url 'delete_board' board_name=request.resolver_match.kwargs.board_name %}" onclick="return confirm('Are you sure you want to delete this board? This action cannot be undone.');">Delete Board</a>
                          </li>
@@ -52,8 +47,6 @@
             {% endif %}
         </li>
     </ul>
-
-    <!-- User Account Dropdown -->
     <li class="nav-item dropdown">
         <a class="nav-link" href="#" id="user-account-dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <span class="bi-person-circle"></span>
