@@ -223,7 +223,7 @@ class CreateBoardForm(forms.ModelForm):
             return True
         else:
             return False
-        return (board_type_to_analyse == "INVALID")
+        #return (board_type_to_analyse == "INVALID")
 
 
     def checkEmails(self,team_emails_to_analyse,board_type_to_analyse):
@@ -236,7 +236,7 @@ class CreateBoardForm(forms.ModelForm):
                 return True
             else:
                 return self.emails_exist_in_database()
-        return False
+        #return False
 
 
     def save(self):
@@ -285,6 +285,7 @@ class CreateTaskForm(forms.ModelForm):
 
 
 class AddMemberForm(forms.Form):
+    
     email = forms.EmailField(label='Member Email')
 
     def email_exist_in_database(self, email):
@@ -308,12 +309,10 @@ class AddMemberForm(forms.Form):
         return email
 
 
-#forms for checkbox -> remove member 
-
 class RemoveMemberForm(forms.Form):
+    
     email = forms.EmailField(label='Member Email')
-
-
+    
     def email_exist_in_database(self, email):
         """Check if the email exists in the User model."""
         try:

@@ -6,7 +6,6 @@
   border-radius: 0px;
 }
 
-
 /*
  * Cover page
  */
@@ -89,11 +88,8 @@ p.cover-text {
   border-color: black; 
 }
 
-
-
-
 /*
- * forms
+ * Forms
  */
 .nolabel label {
   display: none;
@@ -153,12 +149,7 @@ h3.profile-title {
 }
 
 
-
-/*
-Drop down menu for the menu button
-*/
-
-/* Custom CSS for Navbar Dropdown */
+/* For Navbar Dropdown */
 .navbar .dropdown-menu {
   margin-top: 0; 
 }
@@ -173,7 +164,7 @@ Drop down menu for the menu button
   color: #007bff; 
 }
 
-/* Custom CSS for Navbar Dropdown with Checkboxes */
+/* For Navbar Dropdown with Checkboxes */
 .navbar .dropdown-menu .form-check {
   padding: 0.5rem 1rem; /* Adjust padding for each item */
   display: flex;
@@ -181,11 +172,11 @@ Drop down menu for the menu button
 }
 
 .navbar .dropdown-menu .form-check-input {
-  margin-right: 0.5rem; /* Space between checkbox and label */
+  margin-right: 0.5rem; 
 }
 
 .navbar .dropdown-menu .form-check-label {
-  margin-bottom: 0; /* Remove default bottom margin */
+  margin-bottom: 0; 
 }
 
 /*
