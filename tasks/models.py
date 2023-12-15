@@ -89,7 +89,6 @@ class Achievements(models.Model):
     def increment_achievements(self,achievement_type):
 
         achievement = f'number_of_{achievement_type}'
-        print(achievement)
         setattr(self, achievement, getattr(self, achievement) + 1)
 
         # Check for milestones and update dates
