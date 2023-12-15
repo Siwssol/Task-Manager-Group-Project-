@@ -1,79 +1,120 @@
-    {% extends 'base_content.html' %}
-    {% block content %}
+{% extends 'base_content.html' %}
+{% block content %}
 <head>
-    <meta charset="UTF-8">
-    <title>Achievements</title>
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Helvetica Neue', 'Helvetica', sans-serif;
-            color: #333;
-        }
+<meta charset="UTF-8">
+<title>Achievements</title>
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Helvetica Neue', 'Helvetica', sans-serif;
+        color: #333;
+    }
 
-        .container {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+    .container {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-        h2 {
-            margin-bottom: 30px;
-        }
+    h2 {
+        margin-bottom: 30px;
+    }
 
-        .achievement-card {
-            background-color: #fff;
-            border: 1px solid #d3d3d3;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            transition: transform 0.3s ease-in-out;
-        }
+    .achievement-card {
+        background-color: #fff;
+        border: 1px solid #d3d3d3;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        transition: transform 0.3s ease-in-out;
+    }
 
-        .achievement-card:hover {
-            transform: scale(1.02);
-        }
+    .achievement-card:hover {
+        transform: scale(1.02);
+    }
 
-        .card-body {
-            padding: 20px;
-        }
+    .card-body {
+        padding: 20px;
+    }
 
-        .achievement-title {
-            color: #007bff;
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
+    .achievement-title {
+        color: #007bff;
+        font-size: 1.5em;
+        margin-bottom: 10px;
+    }
 
-        .achievement-detail {
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            color: #555;
-        }
+    .achievement-detail {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+        color: #555;
+    }
 
-        .view-details-btn {
-            color: #fff;
-            background-color: #007bff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease-in-out;
-        }
+    .view-details-btn {
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease-in-out;
+    }
 
-        .view-details-btn:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    .view-details-btn:hover {
+        background-color: #0056b3;
+    }
+
+#logins-details-modal {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.7);
+justify-content: center;
+align-items: center;
+}
+
+.visible {
+display: flex;
+}
+
+.modal-content {
+background-color: #fff;
+padding: 20px;
+border-radius: 10px;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+</style>
 </head>
 <body>
-
-
+<form method="post" action="">
+    {% csrf_token %}
+    {% for display in details %}
+        {% if display == "display_login" %}
+            {% include 'partials/achievement_partials/login_details.html' %}
+        {% elif display == "display_tasks_created" %}
+            {% include 'partials/achievement_partials/tasks_created_details.html' %}
+        {% elif display == "display_moved_done" %}
+            {% include 'partials/achievement_partials/tasks_done_details.html' %}
+        {% elif display == "display_moved_doing" %}
+            {% include 'partials/achievement_partials/tasks_doing_details.html' %}
+        {% elif display == "display_board_created" %}
+            {% include 'partials/achievement_partials/boards_created_details.html' %}
+        {% elif display == "display_board_deleted" %}
+            {% include 'partials/achievement_partials/boards_deleted_details.html' %}
+        {% endif %}
+    {% endfor %}
     <div class="container">
         <h2 class="text-center mb-4">Your Achievements</h2>
-
         <div class="row">
             <div class="col-md-6">
                 <div class="achievement-card">
                     <div class="card-body">
                         <h3 class="achievement-title">Deleted Boards</h3>
-                        <p class="achievement-detail">You have deleted X boards. Tap for more!</p>
-                        <button class="view-details-btn">View Details</button>
+                        {% if achievements.number_of_boards_deleted == 1 %}
+                            <p class="achievement-detail">You have deleted {{ achievements.number_of_boards_deleted }} board. Tap for more!</p>
+                        {% else %}
+                            <p class="achievement-detail">You have deleted {{ achievements.number_of_boards_deleted }} boards. Tap for more!</p>
+                        {% endif %}
+                        <button class="view-details-btn" name="deleted_button_press">View Details</button>
                     </div>
                 </div>
             </div>
@@ -81,8 +122,12 @@
                 <div class="achievement-card">
                     <div class="card-body">
                         <h3 class="achievement-title">Created Boards</h3>
-                        <p class="achievement-detail">You have created X boards. Tap for more!</p>
-                        <button class="view-details-btn">View Details</button>
+                        {% if achievements.number_of_boards_created == 1 %}
+                            <p class="achievement-detail">You have created {{ achievements.number_of_boards_created }} board. Tap for more!</p>
+                        {% else %}
+                            <p class="achievement-detail">You have created {{ achievements.number_of_boards_created }} boards. Tap for more!</p>
+                        {% endif %}
+                        <button class="view-details-btn" name="created_boards_button_press">View Details</button>
                     </div>
                 </div>
             </div>
@@ -93,8 +138,12 @@
                 <div class="achievement-card">
                     <div class="card-body">
                         <h3 class="achievement-title">Moved to Doing</h3>
-                        <p class="achievement-detail">You have moved X tasks to To Do. Tap for more!</p>
-                        <button class="view-details-btn">View Details</button>
+                        {% if achievements.number_of_tasks_doing == 1 %}
+                            <p class="achievement-detail">You have moved {{ achievements.number_of_boards_created }} task to Doing. Tap for more!</p>
+                        {% else %}
+                            <p class="achievement-detail">You have moved {{ achievements.number_of_tasks_completed }} tasks to Doing. Tap for more!</p>
+                        {% endif %}
+                        <button class="view-details-btn" name="moved_doing_button_press">View Details</button>                        
                     </div>
                 </div>
             </div>
@@ -102,13 +151,44 @@
                 <div class="achievement-card">
                     <div class="card-body">
                         <h3 class="achievement-title">Moved to Done</h3>
-                        <p class="achievement-detail">You have moved X tasks to Done. Tap for more!</p>
-                        <button class="view-details-btn">View Details</button>
+                        {% if achievements.number_of_boards_created == 1 %}
+                            <p class="achievement-detail">You have moved {{ achievements.number_of_boards_created }} task to Done. Tap for more!</p>
+                        {% else  %}
+                            <p class="achievement-detail">You have moved {{ achievements.number_of_tasks_completed }} tasks to Done. Tap for more!</p>
+                        {% endif %}
+                        <button class="view-details-btn" name="moved_done_button_press">View Details</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="achievement-card">
+                    <div class="card-body">
+                        <h3 class="achievement-title">Tasks Created</h3>
+                        {% if achievements.number_of_tasks_created == 1 %}
+                            <p class="achievement-detail">You have created {{ achievements.number_of_tasks_created }} task. Tap for more!</p>
+                        {% else %}
+                            <p class="achievement-detail">You have created {{ achievements.number_of_tasks_created }} tasks. Tap for more!</p>
+                        {% endif %}
+                        <button class="view-details-btn" name="tasks_created_button_press">View Details</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="achievement-card">
+                    <div class="card-body">
+                        <h3 class="achievement-title">Number of Logins</h3>
+                        {% if achievements.number_of_logins_completed == 1 %}
+                            <p class="achievement-detail">You have logged in {{ achievements.number_of_logins_completed }} time. Tap for more!</p>
+                        {% else %}
+                            <p class="achievement-detail">You have logged in {{ achievements.number_of_logins_completed }} times. Tap for more!</p>
+                        {% endif %}
+                        <button class="view-details-btn" name="number_logins_button_press" >View Details</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</form>
 </body>
 
 {% endblock %}

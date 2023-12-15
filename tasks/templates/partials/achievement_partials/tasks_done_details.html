@@ -1,0 +1,55 @@
+{% load static %}
+<head>
+    <link href="{% static 'achievement_overlay.css' %}" rel="stylesheet">
+</head>
+
+
+
+<body>
+    <div class="overlay-table">
+        <form method="post" action="">
+            {% csrf_token %}
+            <button class="close-btn" name="Close">X</button>
+        </form>
+        {% if achievements.number_of_tasks_created == 1 %}
+            <p>Here are all your achievements for tasks completed! You have moved a task to Complete {{ achievements.number_of_tasks_completed }} time so far!</p>
+        {% else %}
+            <p>Here are all your achievements for tasks completed! You have moved a task to Complete {{ achievements.number_of_tasks_completed }} times so far!</p>
+        {% endif %}
+        <table>
+            <thead>
+                <tr>
+                    <th>1st Task </th>
+                    <th>10th Task</th>
+                    <th>50th Task</th>
+                    <th>100th Task</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% if achievements.tasks_completed_1 is None %}
+                        <td> You haven't got this reward yet!</td>
+                    {% else %}
+                        <td>{{ achievements.tasks_completed_1 }}</td>
+                    {% endif %}
+                    {% if achievements.tasks_completed_10 is None %}
+                    <td> You haven't got this reward yet!</td>
+                    {% else %}
+                    <td>{{ achievements.tasks_completed_10 }}</td>
+                    {% endif %}
+                    {% if achievements.tasks_completed_50 is None %}
+                        <td> You haven't got this reward yet!</td>
+                    {% else %}
+                        <td>{{ achievements.tasks_completed_50 }}</td>
+                    {% endif %}
+                    {% if achievements.tasks_completed_100 is None %}
+                        <td> You haven't got this reward yet!</td>
+                    {% else %}
+                        <td>{{ achievements.tasks_completed_100 }}</td>
+                    {% endif %}
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</body>
