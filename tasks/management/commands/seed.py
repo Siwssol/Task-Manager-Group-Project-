@@ -4,7 +4,6 @@ from tasks.models import User, Teams, Board, TaskList, Task
 
 from tasks.models import User, Achievements
 
-
 import pytz
 from faker import Faker
 from random import randint, random
