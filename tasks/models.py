@@ -4,6 +4,7 @@ from django.db import models
 from django.forms import ModelForm
 from libgravatar import Gravatar
 from datetime import datetime
+from pytz import timezone
 
 
 class User(AbstractUser):
@@ -88,24 +89,25 @@ class Achievements(models.Model):
     def increment_achievements(self,achievement_type):
 
         achievement = f'number_of_{achievement_type}'
+        print(achievement)
         setattr(self, achievement, getattr(self, achievement) + 1)
 
         # Check for milestones and update dates
         milestone_field_name = f'{achievement_type}_1'
         if getattr(self, achievement) == 1 and not getattr(self, milestone_field_name):
-            setattr(self, milestone_field_name, timezone.now().date())
+            setattr(self, milestone_field_name, datetime.now().date())
 
         milestone_field_name = f'{achievement_type}_10'
         if getattr(self, achievement) == 10 and not getattr(self, milestone_field_name):
-            setattr(self, milestone_field_name, timezone.now().date())
+            setattr(self, milestone_field_name, datetime.now().date())
 
         milestone_field_name = f'{achievement_type}_50'
         if getattr(self, achievement) == 50 and not getattr(self, milestone_field_name):
-            setattr(self, milestone_field_name, timezone.now().date())
+            setattr(self, milestone_field_name, datetime.now().date())
 
         milestone_field_name = f'{achievement_type}_100'
         if getattr(self, achievement) == 100 and not getattr(self, milestone_field_name):
-            setattr(self, milestone_field_name, timezone.now().date())
+            setattr(self, milestone_field_name, datetime.now().date())
 
         # Save the changes
         self.save()
@@ -140,8 +142,7 @@ class Board(models.Model):
         
     board_name = models.CharField(primary_key=True,
                                 max_length=30,
-                                unique=True,
-                                blank = False
+
                                 )
     
     board_type = models.CharField(max_length=11,

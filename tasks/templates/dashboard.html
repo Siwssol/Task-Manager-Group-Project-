@@ -25,6 +25,10 @@
         text-decoration: none !important;
     }
 
+    .boardName, .boardType {
+        font-size: 30px;
+    }
+
 
     .boards {
         display: grid;
@@ -41,6 +45,7 @@
         height: 600px;
 
     }
+
 
     .boards:hover {
     box-shadow: inset 4px 4px 6px -1px rgba(0,0,0,0.2),
@@ -97,8 +102,8 @@
         h2 {
             font-size: 1.2em;
         }
-
     }
+
 </style>
 </head>
 <body>
@@ -115,7 +120,12 @@
             {% for board in boards %}
             <div class="col-4 boardCont">
                 <a class ="boardLink" href= "{% url 'board' board.board_name %}">
-                    <button type="button" class="boards" >{{ board.board_name }}</button>
+                   <button type="button" class="boards" >
+                        <div>
+                            <label class="boardName">{{ board.board_name }}</label><br>
+                            <label class="boardType">{{ board.board_type }}</label>
+                        </div>
+                   </button>
                 </a>
             </div>
             {% endfor %}
