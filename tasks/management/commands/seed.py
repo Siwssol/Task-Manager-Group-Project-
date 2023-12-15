@@ -73,13 +73,19 @@ class Command(BaseCommand):
 
         for user in users:
             for i in range(10):
-                # Create a new team for each board
+                
                 team = Teams.objects.create(author=user)
-
+                team.members.add(user)
+                # Create a private board without a team
                 board_name = f"{user.username}'s Board {i}"
-                board = Board.objects.create(author=user, board_name=board_name, team=team)
-
-                for list_name in ['To-Do', 'In Progress', 'Done']:
+                board = Board.objects.create(
+                    author=user,
+                    board_name=board_name,
+                    board_type='Private',
+                    team = team
+                )
+    
+"""                for list_name in ['To-Do', 'In Progress', 'Done']:
                     task_list = TaskList.objects.create(board=board, listName=list_name)
 
                     # Create 30 tasks per board
@@ -90,7 +96,7 @@ class Command(BaseCommand):
                             task_description=fake.paragraph(),
                             due_date=fake.date_time_this_year(tzinfo=timezone.utc)
                         )
-            print(f"Created teams, boards, and tasks for user: {user}")
+            print(f"Created private boards and tasks for user: {user}")"""
 
 
     
