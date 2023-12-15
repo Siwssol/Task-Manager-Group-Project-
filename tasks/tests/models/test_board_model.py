@@ -13,12 +13,17 @@ class BoardModelTestCase(TestCase):
 
     def setUp(self):
         super(TestCase,self).setUp()
-        self.user = User.objects.get(username='@johndoe')
-        self.board = Board(
-            author = self.user,
-            board_name = "Test Board",
-            board_type = 'Private',
-            team_emails = "Enter team emails here if necessary, seperated by commas."
+        self.user1 = User.objects.create(username='USER1', email='a@gmail.com', password='Subject6')
+        self.user2 = User.objects.create(username='USER2', email='b@gmail.com', password='Subject6')
+
+        self.team = Teams.objects.create(author=self.user1, members=self.user2)
+
+        self.board = Board.objects.create(
+            author_id=self.user1,
+            board_name='Test Board',
+            board_type='Team',
+            team=self.team
+
         )
         
     def test_valid_board(self):
@@ -39,6 +44,39 @@ class BoardModelTestCase(TestCase):
     
     def test_board_type_must_not_be_invalid(self):
         pass
+
+
+    def test_initialiseteam_method(self):
+        self.board.initialiseteam()
+
+        self.assertEqual(self.board.team.members.count(), 2)
+        self.assertTrue(self.board.team.members.filter(username='@test1').exists())
+        self.assertTrue(self.board.team.members.filter(username='@test2').exists())
+
+    def test_remove_member_method(self):
+        self.board.initialiseteam()
+
+        user_to_remove = self.board.team.members.first()
+        self.board.remove_member(self.user, user_to_remove)
+
+        self.assertEqual(self.board.team.members.count(), 1)
+        self.assertFalse(self.board.team.members.filter(username='@test1').exists())
+        self.assertTrue(self.board.team.members.filter(username='@test2').exists())
+
+    def test_remove_member_method_permission_error(self):
+        self.board.initialiseteam()
+
+        # Create another user
+        other_user = User.objects.create_user(username='otheruser', password='otherpassword', email='other@example.com')
+
+        user_to_remove = self.board.team.members.first()
+        with self.assertRaises(PermissionError):
+            self.board.remove_member(other_user, user_to_remove)
+
+    def test_remove_member_method_value_error(self):
+        other_user = User.objects.create_user(username='otheruser', password='otherpassword', email='other@example.com')
+        with self.assertRaises(ValueError):
+            self.board.remove_member(self.user, other_user)
 
 
     """ THESE TESTS WILL BE NECESSARY FOR TESTING NEW BOARDS APPEARING AND NOT APPEARING"""

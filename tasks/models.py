@@ -4,6 +4,7 @@ from django.db import models
 from django.forms import ModelForm
 from libgravatar import Gravatar
 from datetime import datetime
+from pytz import timezone
 
 
 class User(AbstractUser):
@@ -44,6 +45,74 @@ class User(AbstractUser):
         return self.gravatar(size=60)
 
 
+"""Model in charge of storing achievement metrics for each respective user"""
+class Achievements(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    number_of_boards_created = models.IntegerField(default=0)
+    number_of_boards_deleted = models.IntegerField(default=0)
+    number_of_tasks_created = models.IntegerField(default=0)
+    number_of_tasks_doing = models.IntegerField(default=0)
+    number_of_tasks_completed = models.IntegerField(default=0)
+    number_of_logins_completed = models.IntegerField(default=0)
+
+    boards_created_1 = models.DateField(null=True, blank=True, verbose_name='1st Board Deleted')
+    boards_created_10 = models.DateField(null=True, blank=True, verbose_name='10th Board Deleted')
+    boards_created_50 = models.DateField(null=True, blank=True, verbose_name='50th Board Deleted')
+    boards_created_100 = models.DateField(null=True, blank=True, verbose_name='100th Board Deleted')
+
+    boards_deleted_1 = models.DateField(null=True, blank=True, verbose_name='1st Board Deleted')
+    boards_deleted_10 = models.DateField(null=True, blank=True, verbose_name='10th Board Deleted')
+    boards_deleted_50 = models.DateField(null=True, blank=True, verbose_name='50th Board Deleted')
+    boards_deleted_100 = models.DateField(null=True, blank=True, verbose_name='100th Board Deleted')
+
+    tasks_created_1 = models.DateField(null=True, blank=True, verbose_name='1st Board Deleted')
+    tasks_created_10 = models.DateField(null=True, blank=True, verbose_name='10th Board Deleted')
+    tasks_created_50 = models.DateField(null=True, blank=True, verbose_name='50th Board Deleted')
+    tasks_created_100 = models.DateField(null=True, blank=True, verbose_name='100th Board Deleted')
+
+    tasks_doing_1 = models.DateField(null=True, blank=True, verbose_name='1st Board Deleted')
+    tasks_doing_10 = models.DateField(null=True, blank=True, verbose_name='10th Board Deleted')
+    tasks_doing_50 = models.DateField(null=True, blank=True, verbose_name='50th Board Deleted')
+    tasks_doing_100 = models.DateField(null=True, blank=True, verbose_name='100th Board Deleted')
+
+    tasks_completed_1 = models.DateField(null=True, blank=True, verbose_name='1st Board Deleted')
+    tasks_completed_10 = models.DateField(null=True, blank=True, verbose_name='10th Board Deleted')
+    tasks_completed_50 = models.DateField(null=True, blank=True, verbose_name='50th Board Deleted')
+    tasks_completed_100 = models.DateField(null=True, blank=True, verbose_name='100th Board Deleted')
+
+    logins_completed_1 = models.DateField(null=True, blank=True, verbose_name='1st Board Deleted')
+    logins_completed_10 = models.DateField(null=True, blank=True, verbose_name='10th Board Deleted')
+    logins_completed_50 = models.DateField(null=True, blank=True, verbose_name='50th Board Deleted')
+    logins_completed_100 = models.DateField(null=True, blank=True, verbose_name='100th Board Deleted')
+
+    # increment one of the number fields above depending on the type of task completed
+    def increment_achievements(self,achievement_type):
+
+        achievement = f'number_of_{achievement_type}'
+        print(achievement)
+        setattr(self, achievement, getattr(self, achievement) + 1)
+
+        # Check for milestones and update dates
+        milestone_field_name = f'{achievement_type}_1'
+        if getattr(self, achievement) == 1 and not getattr(self, milestone_field_name):
+            setattr(self, milestone_field_name, datetime.now().date())
+
+        milestone_field_name = f'{achievement_type}_10'
+        if getattr(self, achievement) == 10 and not getattr(self, milestone_field_name):
+            setattr(self, milestone_field_name, datetime.now().date())
+
+        milestone_field_name = f'{achievement_type}_50'
+        if getattr(self, achievement) == 50 and not getattr(self, milestone_field_name):
+            setattr(self, milestone_field_name, datetime.now().date())
+
+        milestone_field_name = f'{achievement_type}_100'
+        if getattr(self, achievement) == 100 and not getattr(self, milestone_field_name):
+            setattr(self, milestone_field_name, datetime.now().date())
+
+        # Save the changes
+        self.save()
+
+
 """ Model in charge of storing user and their respective permission level within the board (restricts interaction ability)"""
 class TeamMembershipStatus(models.Model):
     class Permissions(models.IntegerChoices):
@@ -73,8 +142,7 @@ class Board(models.Model):
         
     board_name = models.CharField(primary_key=True,
                                 max_length=30,
-                                unique=True,
-                                blank = False
+
                                 )
     
     board_type = models.CharField(max_length=11,

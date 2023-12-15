@@ -1,0 +1,52 @@
+{% load static %}
+<head>
+    <link href="{% static 'achievement_overlay.css' %}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="overlay-table">
+        <form method="post" action="">
+            {% csrf_token %}
+            <button class="close-btn" name="Close">X</button>
+        </form>
+        {% if achievements.number_of_boards_deleted == 1 %}
+            <p>Here are all your achievements for boards deleted! You have deleted {{ achievements.number_of_boards_deleted }} board so far!</p>
+        {% else %}
+            <p>Here are all your achievements for boards deleted! You have deleted {{ achievements.number_of_boards_deleted }} boards so far!</p>
+        {% endif %}
+                <table>
+            <thead>
+                <tr>
+                    <th>1st Board </th>
+                    <th>10th Board</th>
+                    <th>50th Board</th>
+                    <th>100th Board</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% if achievements.boards_deleted_1 is None %}
+                        <td> You haven't got this reward yet!</td>
+                    {% else %}
+                        <td>{{ achievements.boards_deleted_1 }}</td>
+                    {% endif %}
+                    {% if achievements.boards_deleted_10 is None %}
+                    <td> You haven't got this reward yet!</td>
+                    {% else %}
+                    <td>{{ achievements.boards_deleted_10 }}</td>
+                    {% endif %}
+                    {% if achievements.boards_deleted_50 is None %}
+                        <td> You haven't got this reward yet!</td>
+                    {% else %}
+                        <td>{{ achievements.boards_deleted_50 }}</td>
+                    {% endif %}
+                    {% if achievements.boards_deleted_100 is None %}
+                        <td> You haven't got this reward yet!</td>
+                    {% else %}
+                        <td>{{ achievements.boards_deleted_100 }}</td>
+                    {% endif %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>

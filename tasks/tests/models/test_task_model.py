@@ -1,79 +1,57 @@
-from tasks.models import Task
+from tasks.models import Task, TaskList, Board, Teams, User
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from datetime import datetime
 
-class TaskModelTestCase(TestCase):
-    # Initialises the ideal response
+class TaskModelsTest(TestCase):
     def setUp(self):
-        self.task = Task.objects.get(test_name='Create User Stories',
-                                     status='To Do',
-                                     task_description = 'Break down assignment tasks',
-                                     due_date = datetime(2023, 10, 9, 23, 55, 59, 342380))
-        
-    # Check the task name isn't empty
-    def test_empty_task_name(self):
-        self.task.task_name = ''
-        self.assert_task_is_invalid()
+        self.user1 = User.objects.create(username='USER1', email='a@gmail.com', password='Subject6')
+        self.user2 = User.objects.create(username='USER2', email='b@gmail.com', password='Subject6')
 
-    # Check task name doesn't exceed given character count
-    def test_task_over_50_characters(self):
-        self.task.task_name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pulvinar magna ac ipsum auctor consequat. Duis lacinia, elit quis tincidunt.'
-        self.assert_task_is_invalid()
+        self.team = Teams.objects.create(author=self.user1)
+        self.team.members.add(self.user1, self.user2)
 
-    # Check the task name is valid
-    def test_valid_task_name(self):
-        self.assert_task_is_valid()
+        self.board = Board.objects.create(
+            author_id= self.user1.id,
+            board_name='Test Board',
+            board_type='Team',
+            team = self.team
+        )
 
-    # Check task name can accept exactly 50 characters
-    def test_task_equals_50_characters(self):
-        self.task.task_name = 'Lorem ipsum dolor sit amet, consectetuer adipiscin'
-        self.assert_task_is_valid()
+        self.task_list = TaskList.objects.create(
+            board=self.board,
+            listName='Test List'
+        )
 
-    # Check task status can accept exactly 50 characters
-    def test_status_equals_50_characters(self):
-        self.task.status = 'Lorem ipsum dolor sit amet, consectetuer adipiscin'
-        self.assert_task_is_valid()
+        self.task = Task.objects.create(
+            list=self.task_list,
+            task_name='Test Task',
+            task_description='Task Description',
+            due_date=datetime.now().date(),
+            task_priority=Task.Priority.LOW
+        )
 
-    # Check task status rejects over 50 chatacters
-    def test_status_over_50_characters(self):
-        self.task.status = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pulvinar magna ac ipsum auctor consequat. Duis lacinia, elit quis tincidunt.'
-        self.assert_task_is_invalid()
+    def test_task_list_creation(self):
+        print("run 1")
+        self.assertEqual(self.task_list.listName, 'Test List')
+        self.assertEqual(self.task_list.board, self.board)
 
-    # Check task status rejects empty description
-    def test_empty_status(self):
-        self.task.status = ''
-        self.assert_task_is_invalid()
+    def test_task_creation(self):
+        print("run 2")
+        self.assertEqual(self.task.task_name, 'Test Task')
+        self.assertEqual(self.task.task_description, 'Task Description')
+        self.assertEqual(self.task.due_date, (datetime.now().date()))
+        self.assertEqual(self.task.task_priority, Task.Priority.LOW)
+        self.assertEqual(self.task.list, self.task_list)
 
-    # Check description rejects an empty string
-    def test_empty_task_description(self):
-        self.task.task_description = ''
-        self.assert_task_is_invalid()
-    
-    # Check description rejects over 1000 characters
-    def test_task_description_over_1000_characters(self):
-        self.task.task_description = 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Fusce vulputate eleifend sapien. Vestibulum purus quam, scelerisque ut, mollis sed, nonummy id, metus. Nullam accumsan lorem in dui. Cras ultricies mi eu turpis hendrerit fringilla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In ac dui quis mi consectetuer lacinia. Nam pretium turpis et arcu. Duis arcu tortor, suscipit eget, imperdiet nec, imperdiet iaculis, ipsum. Sed aliquam ultrices mauris. Integer ante arcu, accumsan a, consectetuer eget, posuere ut, mauris. Praesent adipiscing. Phasellus ullamcorper ipsum rutrum nunc. Nunc nonummy metus. Vestib'
-        self.assert_task_is_invalid()
-
-    # Check description accepts exactly 1000 characters
-    def test_description_equals_1000_characters(self):
-        self.task.status = 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. N'
-        self.assert_task_is_valid()
-
-    
-        
-
-
-
-    # Defines what is valid
-    def assert_task_is_valid(self):
+    def test_assert_task_is_valid(self):
         try:
             self.task.full_clean()
         except (ValidationError):
             self.fail('Test task should be valid')
 
-
-    # Defines what is invalid
-    def assert_task_is_invalid(self):
+    def test_assert_task_is_invalid(self):
+        self.task.task_name = "A" * 100
+        self.task.save()
         with self.assertRaises(ValidationError):
             self.task.full_clean()

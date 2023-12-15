@@ -1,5 +1,9 @@
 from django.core.management.base import BaseCommand, CommandError
+
 from tasks.models import User, Teams, Board, TaskList, Task
+
+from tasks.models import User, Achievements
+
 import pytz
 from faker import Faker
 from random import randint, random
@@ -66,6 +70,7 @@ class Command(BaseCommand):
             first_name=data['first_name'],
             last_name=data['last_name'],
         )
+
     
     
     def create_teams_boards_tasks(self):
@@ -87,6 +92,8 @@ class Command(BaseCommand):
     
 """                for list_name in ['To-Do', 'In Progress', 'Done']:
                     task_list = TaskList.objects.create(board=board, listName=list_name)
+
+        Achievements.objects.create(user = User.objects.get(username = data['username']))
 
                     # Create 30 tasks per board
                     for _ in range(30):

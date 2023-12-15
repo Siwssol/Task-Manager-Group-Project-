@@ -12,9 +12,7 @@ from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
 from tasks.forms import LogInForm, PasswordForm, UserForm, SignUpForm, CreateBoardForm, CreateTaskForm, EditTaskDescriptionForm, EditTaskNameForm, RemoveMemberForm, AddMemberForm, AssignTasksForm
 from tasks.helpers import login_prohibited
-from tasks.models import Board, TaskList, User, Teams, Task, TeamMembershipStatus
-
-
+from tasks.models import Board, TaskList, User, Teams, Task, TeamMembershipStatus, Achievements
 
 
 @login_required
@@ -51,6 +49,8 @@ def create_board_view(request):
             board = Board.objects.create(author=current_user, board_name = board_name,
                                           board_type=board_type, team_emails = board_members,
                                           team = created_team)
+            achievements_instance, created = Achievements.objects.get_or_create(user=current_user)
+            achievements_instance.increment_achievements("boards_created")
             TaskList.objects.create(board = board, listName="To Do")
             TaskList.objects.create(board = board, listName="In Progress")
             TaskList.objects.create(board = board, listName="Completed")
@@ -67,7 +67,7 @@ def create_board_view(request):
 def createTaskView(request, taskListID, board_name):
     taskList = TaskList.objects.get(pk = taskListID)
     form = CreateTaskForm()
-
+    current_user = request.user
     if request.method == 'POST':
         form = CreateTaskForm(request.POST)
         if form.is_valid():
@@ -76,6 +76,8 @@ def createTaskView(request, taskListID, board_name):
             due_date = form.cleaned_data.get('due_date')
             lists = TaskList.objects.all().filter(board=board_name)
             task = Task.objects.create(list = taskList, task_name = task_name, task_description = task_description, due_date = due_date)
+            achievements_instance, created = Achievements.objects.get_or_create(user=current_user)
+            achievements_instance.increment_achievements("tasks_created")
             tasksList = []
             for list in lists:
                 tasks = Task.objects.all().filter(list=list)
@@ -136,24 +138,52 @@ def change_task_description(request, taskID, board_name):
     return render(request, 'change_task_description.html', {'form': form})
 
 
-@login_prohibited
-def home(request):
-    """Display the application's start/home screen."""
-    return render(request, 'home.html')
-
-
+@login_required
 def achievements(request):
+    """ Displays achievements tab in profile dropdown """
     current_user = request.user
-    return render(request, 'achievements.html', {'user': current_user})
+    print(request.method)
+    if request.method == 'POST':
+        current_user = request.user
+        display_overlay = []
+        if 'number_logins_button_press' in request.POST:
+            display_login = True
+            display_overlay.append("display_login")
+        elif 'tasks_created_button_press' in request.POST:
+            display_tasks_created = True
+            display_overlay.append("display_tasks_created")
+        elif 'moved_done_button_press' in request.POST:
+            display_moved_done = True
+            display_overlay.append("display_moved_done")
+        elif 'moved_doing_button_press' in request.POST:
+            display_moved_doing = True
+            display_overlay.append("display_moved_doing")
+        elif 'created_boards_button_press' in request.POST:
+            display_board_created = True
+            display_overlay.append("display_board_created")
+        elif 'deleted_button_press' in request.POST:
+            display_board_deleted = True
+            display_overlay.append("display_board_deleted")
+        achievements_instance, created = Achievements.objects.get_or_create(user=current_user)
+        return render(request, 'achievements.html', {'achievements': achievements_instance,'details':display_overlay})
+    else:
+        achievements_instance, created = Achievements.objects.get_or_create(user=current_user)
+        return render(request, 'achievements.html', {'achievements': achievements_instance})
 
 def updateTaskLocation(request, taskID, board_name):
+    current_user = request.user
     if request.method == 'POST':
         new_list = request.POST.get('new_list')
-
+        print(new_list)
         task = Task.objects.get(id=taskID)
         list = TaskList.objects.get(board=board_name, listName=new_list)
         task.list_id = list
         task.save()
+        achievements_instance, created = Achievements.objects.get_or_create(user=current_user)
+        if (new_list == "In Progress"):
+            achievements_instance.increment_achievements("tasks_doing")
+        elif (new_list == "Completed"):
+            achievements_instance.increment_achievements("tasks_completed")
 
         # Redirect back to the page or wherever you want
         return HttpResponseRedirect(reverse('board', args=[board_name]))
@@ -257,6 +287,8 @@ class LogInView(LoginProhibitedMixin, View):
         user = form.get_user()
         if user is not None:
             login(request, user)
+            achievements_instance, created = Achievements.objects.get_or_create(user=user)
+            achievements_instance.increment_achievements("logins_completed")
             return redirect(self.next)
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
         return self.render()
@@ -300,6 +332,11 @@ class PasswordView(LoginRequiredMixin, FormView):
 
         messages.add_message(self.request, messages.SUCCESS, "Password updated!")
         return reverse('dashboard')
+
+@login_prohibited
+def home(request):
+    """Display the application's start/home screen."""
+    return render(request, 'home.html')
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     """Display user profile editing screen, and handle profile modifications."""
@@ -393,6 +430,7 @@ def remove_member_from_board(request, board_name):
 
 @login_required
 def delete_board(request, board_name):
+    current_user = request.user
     board = get_object_or_404(Board, board_name=board_name)
 
     # Check if the current user is the author of the board
@@ -402,6 +440,8 @@ def delete_board(request, board_name):
 
     # Perform deletion
     board.delete()
+    achievements_instance, created = Achievements.objects.get_or_create(user=current_user)
+    achievements_instance.increment_achievements("boards_deleted")
     messages.success(request, "Board deleted successfully.")
     return redirect('dashboard')
 
@@ -436,16 +476,16 @@ def remove_member_from_board(request, board_name):
     return redirect(reverse('board', kwargs={'board_name': board_name}))
 
 
-@login_required
-def delete_board(request, board_name):
-    board = get_object_or_404(Board, board_name=board_name)
-    if request.user != board.author:
-        messages.error(request, "You do not have permission to delete this board.")
-        return redirect(reverse('board', kwargs={'board_name': board_name}))
+# @login_required
+# def delete_board(request, board_name):
+#     board = get_object_or_404(Board, board_name=board_name)
+#     if request.user != board.author:
+#         messages.error(request, "You do not have permission to delete this board.")
+#         return redirect(reverse('board', kwargs={'board_name': board_name}))
     
-    board.delete()
-    messages.success(request, "Board deleted successfully.")
-    return redirect('dashboard')
+#     board.delete()
+#     messages.success(request, "Board deleted successfully.")
+#     return redirect('dashboard')
 
 @login_required
 def assign_tasks_view(request, taskID, board_name):
