@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from tasks.models import User
+from tasks.models import User, Achievements
 
 import pytz
 from faker import Faker
@@ -64,6 +64,8 @@ class Command(BaseCommand):
             first_name=data['first_name'],
             last_name=data['last_name'],
         )
+        Achievements.objects.create(user = User.objects.get(username = data['username']))
+
 
 def create_username(first_name, last_name):
     return '@' + first_name.lower() + last_name.lower()
