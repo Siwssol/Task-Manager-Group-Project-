@@ -1,39 +1,88 @@
 """"Tests for the Change Task Description View"""
-from django.test import TestCase
-from tasks.forms import EditTaskDescriptionForm
+from django.test import TestCase, Client
 from django.urls import reverse
+from tasks.models import Task, TaskList, Board, User, Teams
+from tasks.forms import EditTaskDescriptionForm
 from datetime import datetime
-from tasks.models import Task
 
 class EditTaskDescriptionTestCase(TestCase):
     """"Tests for the Change Task Description View"""
 
     def setUp(self):
-        self.url = reverse('change_task_description')
-        self.task = Task.objects.get(task_name='Create User Stories',
-                                        status='To Do',
-                                        new_description = 'Break down assignment tasks',
-                                        due_date = datetime(2023, 10, 9, 23, 55, 59, 342380))
+        self.client = Client()
 
-    def test_get_change_task_description(self):
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'change_task_description.html')
-        form = response.context['form']
-        self.assertTrue(isinstance(form, EditTaskDescriptionForm))
-        self.assertFalse(form.is_bound)
+        # Create a user
+        self.user1 = User.objects.create(username='USER1', email='a@gmail.com', password='Subject6')
+        self.user2 = User.objects.create(username='USER2', email='b@gmail.com', password='Subject6')
 
-    def test_unsuccessful_change_task_description(self):
-        self.task['new_description'] = 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Fusce vulputate eleifend sapien. Vestibulum purus quam, scelerisque ut, mollis sed, nonummy id, metus. Nullam accumsan lorem in dui. Cras ultricies mi eu turpis hendrerit fringilla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In ac dui quis mi consectetuer lacinia. Nam pretium turpis et arcu. Duis arcu tortor, suscipit eget, imperdiet nec, imperdiet iaculis, ipsum. Sed aliquam ultrices mauris. Integer ante arcu, accumsan a, consectetuer eget, posuere ut, mauris. Praesent adipiscing. Phasellus ullamcorper ipsum rutrum nunc. Nunc nonummy metus. Vestib'
-        response = self.client.post(self.url, self.task)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'change_task_description.html')
-        form = response.context['form']
-        self.assertTrue(isinstance(form, EditTaskDescriptionForm))
-        self.assertTrue(form.is_bound)
+        # Log in the user
+        self.client.login(username='USER1', password='Subject6')
 
-    def test_unsuccessful_change_task_description(self):
-        response = self.client.post(self.url, self.task)
-        response_url = reverse('change_task_description')
-        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'change_task_description.html')
+        self.team = Teams.objects.create(author=self.user1)
+        self.team.members.add(self.user1, self.user2)
+
+        # Create a board, task list, and task
+        self.board = Board.objects.create(
+            author_id=self.user1.id,
+            board_name='Test Board',
+            board_type='Team',
+            team = self.team
+        )
+
+        self.task_list = TaskList.objects.create(
+            board=self.board,
+            listName='Test List'
+        )
+
+        self.task = Task.objects.create(
+            list=self.task_list,
+            task_name='Test Task',
+            task_description='Task Description',
+            due_date=datetime.now().date(),
+            task_priority=Task.Priority.LOW
+        )
+
+    def test_change_task_description_view(self):
+        # Prepare the data for the POST request
+        data = {
+            'new_description': 'New description',
+            'board_name': self.board.board_name
+        }
+
+        self.client.login(username=self.user1.username, password='Subject6')
+
+        # Get the URL for the view
+        url = reverse('change_task_description', args=[self.task.id, self.board.board_name])
+
+
+        # Send a POST request to the view
+        response = self.client.post(url, data)
+
+        # Check if the response is a redirect (indicating success)
+        self.assertRedirects(response,  reverse('board', args=[self.board.board_name]))
+
+        # Refresh the task from the database
+        self.task.refresh_from_db()
+
+        # Check if the task description has been updated
+        self.assertEqual(self.task.task_description, 'New description')
+
+    def test_change_task_description_invalid_form(self):
+        # Prepare invalid data for the POST request
+        invalid_data = {
+            'new_description': 'A' * 1000,  # This exceeds the maxlength of the textarea
+            'board_name': self.board.board_name
+        }
+
+        # Get the URL for the view
+        url = reverse('change_task_description', args=[self.task.id, self.board.board_name])
+
+        # Send a POST request with invalid data to the view
+        response = self.client.post(url, invalid_data)
+
+        # Check if the response contains the form
+        self.assertContains(response, '<form')
+
+        # Check if the task description has not been updated
+        self.task.refresh_from_db()
+        self.assertEqual(self.task.task_description, 'Original description')

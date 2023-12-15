@@ -13,12 +13,17 @@ class BoardModelTestCase(TestCase):
 
     def setUp(self):
         super(TestCase,self).setUp()
-        self.user = User.objects.get(username='@johndoe')
-        self.board = Board(
-            author = self.user,
-            board_name = "Test Board",
-            board_type = 'Private',
-            team_emails = "Enter team emails here if necessary, seperated by commas."
+        self.user1 = User.objects.create(username='USER1', email='a@gmail.com', password='Subject6')
+        self.user2 = User.objects.create(username='USER2', email='b@gmail.com', password='Subject6')
+
+        self.team = Teams.objects.create(author=self.user1, members=self.user2)
+
+        self.board = Board.objects.create(
+            author_id=self.user1,
+            board_name='Test Board',
+            board_type='Team',
+            team=self.team
+
         )
         
     def test_valid_board(self):
