@@ -142,27 +142,20 @@ def change_task_description(request, taskID, board_name):
 def achievements(request):
     """ Displays achievements tab in profile dropdown """
     current_user = request.user
-    print(request.method)
     if request.method == 'POST':
         current_user = request.user
         display_overlay = []
         if 'number_logins_button_press' in request.POST:
-            display_login = True
             display_overlay.append("display_login")
         elif 'tasks_created_button_press' in request.POST:
-            display_tasks_created = True
             display_overlay.append("display_tasks_created")
         elif 'moved_done_button_press' in request.POST:
-            display_moved_done = True
             display_overlay.append("display_moved_done")
         elif 'moved_doing_button_press' in request.POST:
-            display_moved_doing = True
             display_overlay.append("display_moved_doing")
         elif 'created_boards_button_press' in request.POST:
-            display_board_created = True
             display_overlay.append("display_board_created")
         elif 'deleted_button_press' in request.POST:
-            display_board_deleted = True
             display_overlay.append("display_board_deleted")
         achievements_instance, created = Achievements.objects.get_or_create(user=current_user)
         return render(request, 'achievements.html', {'achievements': achievements_instance,'details':display_overlay})
@@ -174,7 +167,6 @@ def updateTaskLocation(request, taskID, board_name):
     current_user = request.user
     if request.method == 'POST':
         new_list = request.POST.get('new_list')
-        print(new_list)
         task = Task.objects.get(id=taskID)
         list = TaskList.objects.get(board=board_name, listName=new_list)
         task.list_id = list

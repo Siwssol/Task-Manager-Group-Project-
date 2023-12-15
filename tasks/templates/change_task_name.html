@@ -3,6 +3,11 @@
     body {
         margin: 0;
         overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      
     }
 
     .backgroundCont {
@@ -25,13 +30,11 @@
     .formContainer {
         z-index: 1;
         position: relative;
-        width: 400px;
+        width: max-content;
         height: min-content;
         background-color: transparent;
         backdrop-filter: blur(8px);
         border-radius: 20px;
-        left: 36%;
-        top: 100px;
         box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.35);
     }
 
@@ -39,6 +42,11 @@
         padding: 10px;
         justify-content: center;
         display: flex;
+    }
+
+    .invalid-feedback {
+        font-size: 20px;
+        color: white;
     }
 
     .inputName {
@@ -272,13 +280,20 @@
     <div class="EnterNameCont">
         <form method="post" action="{% url 'change_task_name' taskID=request.resolver_match.kwargs.taskID board_name=request.resolver_match.kwargs.board_name  %}">
             {% csrf_token %}
+
             <div class="inputCont">
                 <label class="inputName">New Name</label>
                 <input class="inputBox" type="text" name="new_name">{{ new_name }}
+                {% if form.new_name.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.new_name.errors }}
+                    </div>
+                {% endif %}
             </div>
             <div class="buttonCont">
                 <button class="submitBut" type="submit">Change Task Name</button>
             </div>
+
         </form>
     </div>
 </div>
