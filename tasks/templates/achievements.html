@@ -139,9 +139,9 @@ box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
                     <div class="card-body">
                         <h3 class="achievement-title">Moved to Doing</h3>
                         {% if achievements.number_of_tasks_doing == 1 %}
-                            <p class="achievement-detail">You have moved {{ achievements.number_of_boards_created }} task to Doing. Tap for more!</p>
+                            <p class="achievement-detail">You have moved {{ achievements.number_of_tasks_doing }} task to Doing. Tap for more!</p>
                         {% else %}
-                            <p class="achievement-detail">You have moved {{ achievements.number_of_tasks_completed }} tasks to Doing. Tap for more!</p>
+                            <p class="achievement-detail">You have moved {{ achievements.number_of_tasks_doing }} tasks to Doing. Tap for more!</p>
                         {% endif %}
                         <button class="view-details-btn" name="moved_doing_button_press">View Details</button>                        
                     </div>
@@ -152,7 +152,7 @@ box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
                     <div class="card-body">
                         <h3 class="achievement-title">Moved to Done</h3>
                         {% if achievements.number_of_boards_created == 1 %}
-                            <p class="achievement-detail">You have moved {{ achievements.number_of_boards_created }} task to Done. Tap for more!</p>
+                            <p class="achievement-detail">You have moved {{ achievements.number_of_tasks_completed }} task to Done. Tap for more!</p>
                         {% else  %}
                             <p class="achievement-detail">You have moved {{ achievements.number_of_tasks_completed }} tasks to Done. Tap for more!</p>
                         {% endif %}
