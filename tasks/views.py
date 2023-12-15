@@ -144,7 +144,29 @@ def home(request):
 
 def achievements(request):
     current_user = request.user
-    return render(request, 'achievements.html', {'user': current_user})
+
+
+    if request.method == 'POST':
+        current_user = request.user
+        display_overlay = []
+        if 'number_logins_button_press' in request.POST:
+            display_overlay.append("display_login")
+        elif 'tasks_created_button_press' in request.POST:
+            display_overlay.append("display_tasks_created")
+        elif 'moved_done_button_press' in request.POST:
+            display_overlay.append("display_moved_done")
+        elif 'moved_doing_button_press' in request.POST:
+            display_overlay.append("display_moved_doing")
+        elif 'created_boards_button_press' in request.POST:
+            display_overlay.append("display_board_created")
+        elif 'deleted_button_press' in request.POST:
+            display_overlay.append("display_board_deleted")
+        achievements_instance, created = Achievements.objects.get_or_create(user=current_user)
+        return render(request, 'achievements.html', {'achievements': achievements_instance,'details':display_overlay})
+    else:
+        achievements_instance, created = Achievements.objects.get_or_create(user=current_user)
+        return render(request, 'achievements.html', {'achievements': achievements_instance})
+
 
 def updateTaskLocation(request, taskID, board_name):
     if request.method == 'POST':

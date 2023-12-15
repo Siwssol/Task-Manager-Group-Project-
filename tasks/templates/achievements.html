@@ -93,8 +93,16 @@
                 <div class="achievement-card">
                     <div class="card-body">
                         <h3 class="achievement-title">Moved to Doing</h3>
+
                         <p class="achievement-detail">You have moved X tasks to To Do. Tap for more!</p>
                         <button class="view-details-btn">View Details</button>
+
+                        {% if achievements.number_of_tasks_doing == 1 %}
+                            <p class="achievement-detail">You have moved {{ achievements.number_of_tasks_doing }} task to Doing. Tap for more!</p>
+                        {% else %}
+                            <p class="achievement-detail">You have moved {{ achievements.number_of_tasks_doing }} tasks to Doing. Tap for more!</p>
+                        {% endif %}
+                        <button class="view-details-btn" name="moved_doing_button_press">View Details</button>                        
                     </div>
                 </div>
             </div>
@@ -104,6 +112,38 @@
                         <h3 class="achievement-title">Moved to Done</h3>
                         <p class="achievement-detail">You have moved X tasks to Done. Tap for more!</p>
                         <button class="view-details-btn">View Details</button>
+                        {% if achievements.number_of_boards_created == 1 %}
+                            <p class="achievement-detail">You have moved {{ achievements.number_of_tasks_completed }} task to Done. Tap for more!</p>
+                        {% else  %}
+                            <p class="achievement-detail">You have moved {{ achievements.number_of_tasks_completed }} tasks to Done. Tap for more!</p>
+                        {% endif %}
+                        <button class="view-details-btn" name="moved_done_button_press">View Details</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="achievement-card">
+                    <div class="card-body">
+                        <h3 class="achievement-title">Tasks Created</h3>
+                        {% if achievements.number_of_tasks_created == 1 %}
+                            <p class="achievement-detail">You have created {{ achievements.number_of_tasks_created }} task. Tap for more!</p>
+                        {% else %}
+                            <p class="achievement-detail">You have created {{ achievements.number_of_tasks_created }} tasks. Tap for more!</p>
+                        {% endif %}
+                        <button class="view-details-btn" name="tasks_created_button_press">View Details</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="achievement-card">
+                    <div class="card-body">
+                        <h3 class="achievement-title">Number of Logins</h3>
+                        {% if achievements.number_of_logins_completed == 1 %}
+                            <p class="achievement-detail">You have logged in {{ achievements.number_of_logins_completed }} time. Tap for more!</p>
+                        {% else %}
+                            <p class="achievement-detail">You have logged in {{ achievements.number_of_logins_completed }} times. Tap for more!</p>
+                        {% endif %}
+                        <button class="view-details-btn" name="number_logins_button_press" >View Details</button>
                     </div>
                 </div>
             </div>
